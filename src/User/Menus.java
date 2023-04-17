@@ -41,7 +41,7 @@ public class Menus {
                     System.out.println("Sin implementar");
                 }
                 case 2: {
-                    Modules.catalogExemplar();
+                    Modules.registrarEjemplar();
                 }
                 case 3: {
                     salir = true;

@@ -16,4 +16,7 @@ public abstract class DBConnection {
             e.printStackTrace();
         }
     }
+    protected Connection getConnection() {
+        return this.connection;
+    }
 }

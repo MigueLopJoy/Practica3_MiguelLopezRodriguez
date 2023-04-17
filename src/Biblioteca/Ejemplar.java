@@ -3,21 +3,16 @@ package Biblioteca;
 public class Ejemplar {
     private int idEjemplar;
     private String codigoEjemplar;
-    private int idLibro;
-
-    public Ejemplar() {
-        super();
-    }
-    public Ejemplar(String codigoEjemplar, int idLibro) {
-        this.codigoEjemplar = codigoEjemplar;
-        this.idLibro = idLibro;
+    private Libro libro;
+    public Ejemplar(Libro libro) {
+        this.codigoEjemplar = generarCodigoEjemplar();
+        this.libro = libro;
     }
     public Ejemplar(int idEjemplar, String codigoEjemplar, int idLibro) {
         this.idEjemplar = idEjemplar;
         this.codigoEjemplar = codigoEjemplar;
-        this.idLibro = idLibro;
+        this.libro = libro;
     }
-
     public int getIdEjemplar() {
         return idEjemplar;
     }
@@ -34,14 +29,27 @@ public class Ejemplar {
         this.codigoEjemplar = codigoEjemplar;
     }
 
-    public int getIdLibro() {
-        return idLibro;
+    public Libro getLibro() {
+        return libro;
     }
 
-    public void setIdLibro(int idLibro) {
-        this.idLibro = idLibro;
+    public void setLibro(int idLibro) {
+        this.libro = libro;
     }
     public String getInsertString() {
-        return "INSERT INTO ejemplares (codigoEjemplar, idLibro) VALUES ('" + codigoEjemplar + "', '" + idLibro + "');";
+        return "INSERT INTO ejemplares (codigoEjemplar, idLibro) VALUES ('" + codigoEjemplar + "', '" + libro.getIdLibro() + "');";
+    }
+
+    private String generarCodigoEjemplar() {
+        String codigoEjemplar = "";
+
+        for (int i = 0; i < 6; i++) {
+            codigoEjemplar += (int)(Math.random()*10)+ 1;
+        }
+        for (int i = 0; i < 2; i++) {
+            codigoEjemplar += (char)(Math.random() * 90 - 65) + 90;
+        }
+
+        return codigoEjemplar;
     }
 }

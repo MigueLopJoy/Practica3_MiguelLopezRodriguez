@@ -1,13 +1,40 @@
 package User;
 
 import Biblioteca.Autor;
-import Gestion.Libro;
+import Biblioteca.Libro;
+import Gestion.Utils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 public class askForData {
 	private static Scanner scanner = new Scanner(System.in);
+	public LocalDate pedirFecha(String texto) {
+		LocalDate fecha;
+		String fechaString;
+		int año;
+		int mes;
+		int dia;
+		do {
+			fechaString = pedirString(texto);
+			if (!Utils.validarFormatoFecha(fechaString)){
+				System.out.println("Formato de fecha incorrecto");
+			}
+		} while (!Utils.validarFormatoFecha(fechaString));
+		dia = Utils.convertirEnNumero(fechaString.substring(0, 2));
+		mes = Utils.convertirEnNumero(fechaString.substring(3, 5));
+		año = Utils.convertirEnNumero(fechaString.substring(6));
+		fecha = LocalDate.of(año, mes, dia);
+		return fecha;
+	}
+
+	public static String pedirString(String texto) {
+		String retorno;
+		System.out.println(texto);
+		retorno = scanner.nextLine();
+		return retorno;
+	}
+
 	public static int PedirInt(String texto) {
 		int retorno;
 		System.out.print(texto + "\n");
@@ -20,6 +47,7 @@ public class askForData {
 		scanner.nextLine();
 		return retorno;
 	}
+
 	public static int PedirInt(int min, int max) {
 		int retorno;
 		int corrector;
@@ -42,6 +70,7 @@ public class askForData {
 		} while (retorno < min || retorno > max);
 		return retorno;
 	}
+
 	public static int PedirInt(String texto, int min, int max) {
 		int retorno;
 		int corrector;

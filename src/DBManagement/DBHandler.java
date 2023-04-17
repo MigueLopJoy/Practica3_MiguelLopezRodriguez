@@ -47,6 +47,15 @@ public class DBHandler {
             }
         }
     }
+
+    public static boolean hayRegistros() {
+        boolean hayRegistros = false;
+
+
+
+
+        return hayRegistros;
+    }
     public static void closeStatement(Statement statement) {
         try {
             if (statement != null) {
