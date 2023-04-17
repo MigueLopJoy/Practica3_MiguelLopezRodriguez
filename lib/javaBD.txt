@@ -1,0 +1,207 @@
+// confirmar conexion:
+
+package viviendas;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class Principal {
+
+	public static void main(String[] args) throws ClassNotFoundException {
+		// TODO Auto-generated method stub
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost",
+					"root", "");
+
+			conexion.close();
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			//System.out.println("Error");
+		}
+		
+		System.out.println("Conectado/desconectado");
+		
+
+	}
+
+}
+
+//ejecutar un count/sum/avg....
+package viviendas;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Principal {
+
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		// TODO Auto-generated method stub
+		Connection conexion=null;
+		Statement sentenciaSQL = null;
+		int numero=0;
+		
+		try {
+			//conectar con la base de datos
+			Class.forName("com.mysql.jdbc.Driver");
+			conexion = DriverManager.getConnection("jdbc:mysql://localhost/viviendas",
+					"root", "");// proporcionamos la dirección, el administrador y la clave
+			
+			//creamos sentencias ejecutables sobre esa conexión
+			sentenciaSQL = conexion.createStatement();
+			
+			//almaceno el resultado de la sql en un resulset (conjunto de registros)
+			ResultSet rs  = sentenciaSQL.executeQuery("SELECT count(*) FROM pisos");
+		     // chequeo que el result set no sea vacío, moviendo el cursor a la 
+		     // primer fila. (El cursor inicia antes de la primer fila)
+		     if(rs.next()) {
+		       //Si hay resultados obtengo el valor. 
+		        numero= rs.getInt(1);
+		        System.out.println(numero);
+		     }
+			
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			//System.out.println("Error");
+		}finally {
+			conexion.close();
+			
+		}
+		
+		System.out.println("Conectado/desconectado");
+		
+
+	}
+
+}
+//ejecutar un select
+package viviendas;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Principal {
+
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		// TODO Auto-generated method stub
+		Connection conexion = null;
+		Statement sentenciaSQL = null;
+		ResultSet rs;
+		int propietario = 1;
+		String sql = "";
+
+		try {
+			// conectar con la base de datos
+			Class.forName("com.mysql.jdbc.Driver");
+			conexion = DriverManager.getConnection("jdbc:mysql://localhost/viviendas", "root", "");// proporcionamos la
+																									// dirección, el
+																									// administrador y
+																									// la clave
+
+			// creamos sentencias ejecutables sobre esa conexión
+			sentenciaSQL = conexion.createStatement();
+
+			// almaceno el resultado de la sql en un resulset (conjunto de registros)
+			sql = "SELECT * FROM `propietariospisos` WHERE `idpropietario`=" + propietario;
+			// System.out.println(sql);
+
+			rs = sentenciaSQL.executeQuery(sql);
+
+			// chequeo que el result set no sea vacío, moviendo el cursor a la
+			// primer fila. (El cursor inicia antes de la primer fila)
+			while (rs.next()) {
+				// Si hay resultados obtengo el valor.
+
+				System.out.println("dirección: " + rs.getString("direccion") + " - m2: " + rs.getInt("m2"));
+			}
+
+			
+
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			// System.out.println("Error");
+		} finally {
+			sentenciaSQL.close();
+			conexion.close();
+
+		}
+
+		System.out.println("Conectado/desconectado");
+
+	}
+
+}
+//insertar
+
+package viviendas;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Principal {
+
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		// TODO Auto-generated method stub
+		Connection conexion = null;
+		Statement sentenciaSQL = null;
+		ResultSet rs;
+		int resultado=0;
+		int propietario = 1;
+		String sql = "";
+		String nombrePropietario="María";
+		
+		int nPropietario=1;
+		String calle="Calle del pozo";
+		int m2=60;
+
+		try {
+			// conectar con la base de datos
+			Class.forName("com.mysql.jdbc.Driver");
+			conexion = DriverManager.getConnection("jdbc:mysql://localhost/viviendastest", "root", "");// proporcionamos
+																										// la
+																										// dirección, el
+																										// administrador
+																										// y
+																										// la clave
+
+			// creamos sentencias ejecutables sobre esa conexión
+			sentenciaSQL = conexion.createStatement();
+
+			// almaceno el resultado de la sql en un resulset (conjunto de registros)
+			
+			sql = "INSERT INTO `propietarios` (`idpropietario`, `nombre`) VALUES (NULL, '" + nombrePropietario + "')";
+			//sql = "INSERT INTO `pisos` (`idpiso`, `fidpropietario`, `direccion`, `m2`) VALUES (NULL, '"+nPropietario+"', '"+calle+"', '"+m2+"')";
+			
+			// System.out.println(sql);
+
+			resultado = sentenciaSQL.executeUpdate(sql);
+
+			if (resultado >= 1) {
+				System.out.println("Se ha insertado bien.");
+			}
+
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			// System.out.println("Error");
+		} finally {
+			sentenciaSQL.close();
+			conexion.close();
+
+		}
+
+		System.out.println("Conectado/desconectado");
+
+	}
+
+}
