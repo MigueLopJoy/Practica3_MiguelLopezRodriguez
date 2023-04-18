@@ -1,5 +1,11 @@
 package Biblioteca;
 
+import DBManagement.DBHandler;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Ejemplar {
     private int idEjemplar;
     private String codigoEjemplar;
@@ -39,7 +45,6 @@ public class Ejemplar {
     public String getInsertString() {
         return "INSERT INTO ejemplares (codigoEjemplar, idLibro) VALUES ('" + codigoEjemplar + "', '" + libro.getIdLibro() + "');";
     }
-
     private String generarCodigoEjemplar() {
         String codigoEjemplar = "";
 
@@ -51,5 +56,19 @@ public class Ejemplar {
         }
 
         return codigoEjemplar;
+    }
+
+    public int getIdEjemplarFromDB(Connection connection) {
+        ResultSet resultSet = null;
+        int idEjemplar = 0;
+        resultSet = DBHandler.getResulset(connection, "SELECT idEjemplar FROM catalogo ORDER BY idEjemplar DESC LIMIT 1;");
+        try {
+            if (resultSet.next()) {
+                idEjemplar = resultSet.getInt("idEjemplar");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return idEjemplar;
     }
 }

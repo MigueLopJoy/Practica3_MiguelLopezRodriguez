@@ -1,5 +1,11 @@
 package Biblioteca;
 
+import DBManagement.DBHandler;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Autor {
     private int idAutor;
     private String nombre;
@@ -46,5 +52,46 @@ public class Autor {
 
     public void setApellido2(String apellido2) {
         this.apellido2 = apellido2;
+    }
+
+    public String getInsertString() {
+        String insertString = "";
+
+        if (apellido2 == "") {
+            insertString = "INSERT INTO catalogo (nombre, apellido1, apellido2) VALUES ('"
+                    + nombre + "', '" + apellido1 + "');";
+        } else {
+            insertString = "INSERT INTO catalogo (nombre, apellido1, apellido2) VALUES ('"
+                    + nombre + "', '" + apellido1 + "', '" + apellido2 + "');";
+        }
+        return insertString;
+    }
+    public boolean isRegistrado(Connection connection) {
+        int numeroRegistros;
+        boolean isRegistrado = false;
+        String sql = "";
+        if (apellido2 == "") {
+            sql = "SELECT * FROM autores WHERE nombre = '" + nombre
+                    + "' AND apellido1 = '" + apellido1 + "';";
+        } else {
+            sql = "SELECT * FROM autores WHERE nombre = '" + nombre
+                    + "' AND apellido1 = '" + apellido1 + "' AND apellido2 = " + apellido2 + "';";
+        }
+        numeroRegistros = DBHandler.obtenerCantidadRegistros(connection, sql);
+        isRegistrado = numeroRegistros != 0 ? true : false;
+        return  isRegistrado;
+    }
+    public static int getIdAutorFromDB(Connection connection) {
+        ResultSet resultSet = null;
+        int idAutor = 0;
+        resultSet = DBHandler.getResulset(connection, "SELECT idAutor FROM autores ORDER BY idAutor DESC LIMIT 1;");
+        try {
+            if (resultSet.next()) {
+                idAutor = resultSet.getInt("idAutor");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return idAutor;
     }
 }

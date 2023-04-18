@@ -5,37 +5,46 @@ import Biblioteca.Libro;
 import Gestion.Utils;
 
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.MonthDay;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Scanner;
 public class askForData {
 	private static Scanner scanner = new Scanner(System.in);
-	public LocalDate pedirFecha(String texto) {
+	public static LocalDate pedirFecha(String texto) {
 		LocalDate fecha;
 		String fechaString;
-		int año;
+		Year año;
 		int mes;
 		int dia;
-		do {
-			fechaString = pedirString(texto);
-			if (!Utils.validarFormatoFecha(fechaString)){
-				System.out.println("Formato de fecha incorrecto");
-			}
-		} while (!Utils.validarFormatoFecha(fechaString));
-		dia = Utils.convertirEnNumero(fechaString.substring(0, 2));
-		mes = Utils.convertirEnNumero(fechaString.substring(3, 5));
-		año = Utils.convertirEnNumero(fechaString.substring(6));
-		fecha = LocalDate.of(año, mes, dia);
-		return fecha;
-	}
 
-	public static String pedirString(String texto) {
-		String retorno;
+
+	}
+	public static Year pedirAño(String texto) {
+		Year año;
 		System.out.println(texto);
-		retorno = scanner.nextLine();
+		año = Year.of(pedirInt("Introduzca el año (AAAA)", 0, 9999));
+		return año;
+	}
+	public static Month pedirMes(String texto) {
+		Month mes;
+		System.out.println(texto);
+		mes = Month.of(pedirInt("Introduzca el mes (MM)", 1, 12));
+		return mes;
+	}
+	public static MonthDay pedirDia(String texto, Month mes){
+		MonthDay dia;
+		System.out.println(texto);
+		dia = MonthDay.of(mes, pedirInt("Introduzca el dia (DD)", 1, Utils.calcularDiasMes(mes.getValue())));
+		return  dia;
+	}
+	public static String pedirString(String texto) {
+		System.out.println(texto + "\n");
+		String retorno = scanner.nextLine();
 		return retorno;
 	}
-
-	public static int PedirInt(String texto) {
+	public static int pedirInt(String texto) {
 		int retorno;
 		System.out.print(texto + "\n");
 		while (!scanner.hasNextInt()) {
@@ -48,7 +57,7 @@ public class askForData {
 		return retorno;
 	}
 
-	public static int PedirInt(int min, int max) {
+	public static int pedirInt(int min, int max) {
 		int retorno;
 		int corrector;
 
@@ -71,7 +80,7 @@ public class askForData {
 		return retorno;
 	}
 
-	public static int PedirInt(String texto, int min, int max) {
+	public static int pedirInt(String texto, int min, int max) {
 		int retorno;
 		int corrector;
 
@@ -97,7 +106,7 @@ public class askForData {
 		return retorno;
 	}
 
-	public static int PedirInt(ArrayList<Integer> numsGroup, int max) {
+	public static int pedirInt(ArrayList<Integer> numsGroup, int max) {
 		int retorno = 0;
 
 		do {
@@ -123,7 +132,7 @@ public class askForData {
 		return retorno;
 	}
 
-	public static double PedirDouble(String texto) {
+	public static double pedirDouble(String texto) {
 		double retorno;
 
 		System.out.print(texto + "\n");
@@ -137,7 +146,7 @@ public class askForData {
 		return retorno;
 	}
 
-	public static double PedirDouble(String texto, double min, double max) {
+	public static double pedirDouble(String texto, double min, double max) {
 		double retorno;
 		double corrector;
 
@@ -162,14 +171,7 @@ public class askForData {
 		} while (retorno < min || retorno > max);
 		return retorno;
 	}
-
-	public static String PedirString(String texto) {
-		System.out.println(texto + "\n");
-		String retorno = scanner.nextLine();
-		return retorno;
-	}
-
-	public static boolean Confirmacion(String texto) {
+	public static boolean confirmacion(String texto) {
 		char confirmacion;
         boolean confirmado = false;
 		do {

@@ -1,30 +1,6 @@
 package Gestion;
 
 public class Utils {
-    public static boolean validarFormatoFecha(String fechaString) {
-        String diaString = fechaString.substring(0, 2);
-        String mesString = fechaString.substring(3, 5);
-        String añoString = fechaString.substring(6);
-        int dia;
-        int mes;
-        int año;
-        boolean isValid = false;
-        if (fechaString.charAt(2) == '/' && fechaString.charAt(5) == '/') {
-            if (isNumeric(diaString) && isNumeric(mesString) && isNumeric(añoString)) {
-                año = Integer.parseInt(añoString);
-                mes = Integer.parseInt(mesString);
-                dia = Integer.parseInt(diaString);
-                if (año > 1500 && año < 2022){
-                    if (mes > 1 && mes < 12) {
-                        if (dia > 1 && dia < calcularDiasMes(mes)) {
-                            isValid = true;
-                        }
-                    }
-                }
-            }
-        }
-        return  isValid;
-    };
     public static boolean isNumeric(String data) {
         boolean isNumeric = true;
         try {
@@ -43,7 +19,7 @@ public class Utils {
         }
         return number;
     }
-    private static int calcularDiasMes(int numeroMes) {
+    public static int calcularDiasMes(int numeroMes) {
         int numDias = 0;
 
         switch (numeroMes) {
