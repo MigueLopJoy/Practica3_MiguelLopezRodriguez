@@ -4,11 +4,31 @@ import Biblioteca.Autor;
 import Biblioteca.Ejemplar;
 import Biblioteca.Libro;
 import DBManagement.DBHandler;
-import User.askForData;
+import User.pedirDatos;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Catalogo {
+
+    public static void buscar(){
+
+    }
+
+    public static void mostrarCatalogo() {
+        ArrayList<Libro> libros = DBHandler.getLibros("SELECT * FROM catalogo");
+        ArrayList<Autor> autores = DBHandler.getAutores("SELECT * FROM autores");
+        Autor autor = null;
+        String mensaje = "";
+
+        System.out.println("Libros en catalogo;");
+        for (Libro libro : libros) {
+            autor = libro.getAutor();
+            mensaje = libro.getTitulo() + " / " + autor.getNombre() +  " " + autor.getApellido1() + " " + autor.getApellido2()
+                    + libro.getEditorial() + ", " + libro.getFechaPublicacion();
+            System.out.println(mensaje);
+        }
+    }
     public static void registrarEjemplar() {
         Ejemplar ejemplar = null;
         Libro libro = null;
@@ -70,23 +90,22 @@ public class Catalogo {
         LocalDate fechaPublicacion = null;
         String editorial = "";
 
-        titulo = askForData.pedirString("Intorduzca el titulo del libro");
+        titulo = pedirDatos.pedirString("Intorduzca el titulo del libro");
         autor = crearAutor();
-        fechaPublicacion = askForData.pedirFecha("Introduzca la fecha de publicacion");
-        editorial = askForData.pedirString("Introduzca el nombre de la editorial");
+        fechaPublicacion = pedirDatos.pedirFecha("Introduzca la fecha de publicacion");
+        editorial = pedirDatos.pedirNombre("Introduzca el nombre de la editorial");
         libro = new Libro(titulo, autor, fechaPublicacion, editorial);
         return libro;
     }
-
     public static Autor crearAutor() {
         Autor autor = null;
         String nombre = "";
         String apellido1 = "";
         String apellido2 = "";
 
-        nombre = askForData.pedirString("Introduzca el nombre del autor");
-        apellido1 = askForData.pedirString("Introduzca el primer apellido del autor");
-        apellido2 = askForData.pedirString("Introduzca el segundo apellido del autor (Dejar en blanco si no lo tuviera)");
+        nombre = pedirDatos.pedirNombre("Introduzca el nombre del autor");
+        apellido1 = pedirDatos.pedirNombre("Introduzca el primer apellido del autor");
+        apellido2 = pedirDatos.pedirNombre("Introduzca el segundo apellido del autor (Dejar en blanco si no lo tuviera)");
         autor = new Autor(nombre, apellido1, apellido2);
 
         return autor;

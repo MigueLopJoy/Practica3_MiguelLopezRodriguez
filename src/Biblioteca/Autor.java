@@ -86,7 +86,7 @@ public class Autor {
     }
     public int getIdAutorFromDB() {
         int idAutor = 0;
-        idAutor = DBHandler.getId(getSelectString());
+        idAutor = DBHandler.getInt(getSelectString(), "idAutor");
         return idAutor;
     }
 }

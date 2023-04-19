@@ -1,21 +1,37 @@
 package DBManagement;
 
+import Biblioteca.Autor;
+import Biblioteca.Libro;
 import Gestion.Utils;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
 public class DBHandler {
-    public static void executeQuery(String sql) {
+    public static ArrayList<Libro> getLibros(String sql) {
         MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
         Connection connection = mySQLConnection.getConnection();
+        ArrayList<Libro> libros = new ArrayList<Libro>();
         Statement statement = null;
         ResultSet resultset = null;
+        Libro libro = null;
+        String titulo;
+        Autor autor = null;
+        int idAutor;
+        LocalDate fechaPublicacion;
+        String editorial;
 
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
+            while (resultset.next()){
+                titulo = resultset.getString("titulo");
+                idAutor = resultset.getInt("idAutor");
+                autor = getAutores("SELECT * FROM autores WHERE idAutor = '" + idAutor + "';").get(0);
+                fechaPublicacion = resultset.getDate("fecha_publicacion").toLocalDate();
+                editorial = resultset.getString("editorial");
+                libro = new Libro(titulo, autor, fechaPublicacion, editorial);
+                libros.add(libro);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -27,20 +43,32 @@ public class DBHandler {
                 e.printStackTrace();
             }
         }
+        return libros;
     }
-    public static int getId(String sql) {
+    public static ArrayList<Autor> getAutores(String sql) {
         MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
         Connection connection = mySQLConnection.getConnection();
+        ArrayList<Autor> autores = new ArrayList<Autor>();
         Statement statement = null;
         ResultSet resultset = null;
-        int id = -1;
+        Autor autor = null;
+        String nombre;
+        String apellido1;
+        String apellido2;
 
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
-
-            if (resultset.next()) {
-                id = resultset.getInt(1);
+            while (resultset.next()){
+                nombre = resultset.getString("nombre");
+                apellido1 = resultset.getString("apellido1");
+                if (resultset.getString("apellido2") != null) {
+                    apellido2 = resultset.getString("apellido2");
+                } else {
+                    apellido2 = "";
+                }
+                autor = new Autor(nombre, apellido1, apellido2);
+                autores.add(autor);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -53,7 +81,60 @@ public class DBHandler {
                 e.printStackTrace();
             }
         }
-        return id;
+        return autores;
+    }
+    public static int getInt(String sql, String columnName) {
+        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
+        Connection connection = mySQLConnection.getConnection();
+        Statement statement = null;
+        ResultSet resultset = null;
+        int result = 0;
+
+        try {
+            statement = connection.createStatement();
+            resultset = statement.executeQuery(sql);
+            if (resultset.next()){
+                result = resultset.getInt(columnName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                closeResultset(resultset);
+                closeStatement(statement);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    public static String getString(String sql, String columnName) {
+        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
+        Connection connection = mySQLConnection.getConnection();
+        Statement statement = null;
+        ResultSet resultset = null;
+        String result = "";
+
+        try {
+            statement = connection.createStatement();
+            resultset = statement.executeQuery(sql);
+            if (resultset.next()){
+                result = resultset.getString(columnName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                closeResultset(resultset);
+                closeStatement(statement);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
     public static void executeUpdate(String sql) {
         MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
@@ -77,27 +158,6 @@ public class DBHandler {
                 e.printStackTrace();
             }
         }
-    }
-    public static ResultSet getResulset(String sql) {
-        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
-        Connection connection = mySQLConnection.getConnection();
-        Statement statement = null;
-        ResultSet resultset = null;
-
-        try {
-            statement = connection.createStatement();
-            resultset = statement.executeQuery(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                closeStatement(statement);
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return  resultset;
     }
     public static int obtenerCantidadRegistros(String sql) {
         MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");

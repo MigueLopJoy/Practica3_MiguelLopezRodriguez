@@ -1,6 +1,8 @@
 package Biblioteca;
 
 import DBManagement.DBHandler;
+import User.pedirDatos;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +13,10 @@ public class Libro {
     private Autor autor;
     private LocalDate fechaPublicacion;
     private String editorial;
+
+    public Libro(){
+        super();
+    }
     public Libro(String titulo, Autor autor, LocalDate fechaPublicacion, String editorial) {
         super();
         this.titulo = titulo;
@@ -60,6 +66,10 @@ public class Libro {
         return "INSERT INTO catalogo (titulo, idAutor, fecha_publicacion, editorial) VALUES ('"
                 + titulo + "', '" + autor.getIdAutor() + "', '" + fechaPublicacion + "', '" + editorial + "');";
     }
+
+    public void getDataFromDB() {
+
+    }
     public String getSelectString() {
         return "SELECT * FROM catalogo WHERE titulo = '" + titulo
                 + "' AND idAutor = " + autor.getIdAutor()
@@ -75,7 +85,7 @@ public class Libro {
     }
     public int getIdLibroFromDB() {
         ResultSet resultSet = null;
-        int idLibro = DBHandler.getId(getSelectString());
+        int idLibro = DBHandler.getInt(getSelectString(), "idLibro");
         return idLibro;
     }
 }

@@ -7,7 +7,7 @@ import java.time.MonthDay;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Scanner;
-public class askForData {
+public class pedirDatos {
 	private static Scanner scanner = new Scanner(System.in);
 	public static LocalDate pedirFecha(String texto) {
 		LocalDate fecha;
@@ -38,6 +38,14 @@ public class askForData {
 		numeroDia = pedirInt(texto, 0, Utils.calcularDiasMes(mes.getValue()));
 		dia = numeroDia == 0 ? MonthDay.of(mes, 1) : MonthDay.of(mes, numeroDia);
 		return  dia;
+	}
+	public static String pedirNombre(String texto) {
+		String retorno;
+		do {
+			retorno = pedirDatos.pedirString(texto);
+			retorno = Utils.convertirMayuscula(retorno);
+		} while (!Utils.validarNombre(retorno));
+		return retorno;
 	}
 	public static String pedirString(String texto) {
 		System.out.println(texto + "\n");

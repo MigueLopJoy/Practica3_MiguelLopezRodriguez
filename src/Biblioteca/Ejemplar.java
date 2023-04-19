@@ -48,7 +48,7 @@ public class Ejemplar {
     }
     public int getIdEjemplarFromDB() {
         int idEjemplar;
-        idEjemplar = DBHandler.getId(getSelectString());
+        idEjemplar = DBHandler.getInt(getSelectString(), "idEjemplar");
         return idEjemplar;
     }
     private String generarCodigoEjemplar() {
