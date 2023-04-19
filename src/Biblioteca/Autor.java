@@ -25,11 +25,9 @@ public class Autor {
     public int getIdAutor() {
         return idAutor;
     }
-
     public void setIdAutor(int idAutor) {
         this.idAutor = idAutor;
     }
-
     public String getNombre() {
         return nombre;
     }
@@ -58,40 +56,37 @@ public class Autor {
         String insertString = "";
 
         if (apellido2 == "") {
-            insertString = "INSERT INTO catalogo (nombre, apellido1, apellido2) VALUES ('"
+            insertString = "INSERT INTO autores (nombre, apellido1) VALUES ('"
                     + nombre + "', '" + apellido1 + "');";
         } else {
-            insertString = "INSERT INTO catalogo (nombre, apellido1, apellido2) VALUES ('"
+            insertString = "INSERT INTO autores (nombre, apellido1, apellido2) VALUES ('"
                     + nombre + "', '" + apellido1 + "', '" + apellido2 + "');";
         }
         return insertString;
     }
-    public boolean isRegistrado(Connection connection) {
-        int numeroRegistros;
-        boolean isRegistrado = false;
-        String sql = "";
+
+    public String getSelectString() {
+        String selectString = "";
+
         if (apellido2 == "") {
-            sql = "SELECT * FROM autores WHERE nombre = '" + nombre
+            selectString = "SELECT * FROM autores WHERE nombre = '" + nombre
                     + "' AND apellido1 = '" + apellido1 + "';";
         } else {
-            sql = "SELECT * FROM autores WHERE nombre = '" + nombre
-                    + "' AND apellido1 = '" + apellido1 + "' AND apellido2 = " + apellido2 + "';";
+            selectString = "SELECT * FROM autores WHERE nombre = '" + nombre
+                    + "' AND apellido1 = '" + apellido1 + "' AND apellido2 = '" + apellido2 + "';";
         }
-        numeroRegistros = DBHandler.obtenerCantidadRegistros(connection, sql);
+        return selectString;
+    }
+    public boolean isRegistrado() {
+        int numeroRegistros;
+        boolean isRegistrado = false;
+        numeroRegistros = DBHandler.obtenerCantidadRegistros(getSelectString());
         isRegistrado = numeroRegistros != 0 ? true : false;
         return  isRegistrado;
     }
-    public static int getIdAutorFromDB(Connection connection) {
-        ResultSet resultSet = null;
+    public int getIdAutorFromDB() {
         int idAutor = 0;
-        resultSet = DBHandler.getResulset(connection, "SELECT idAutor FROM autores ORDER BY idAutor DESC LIMIT 1;");
-        try {
-            if (resultSet.next()) {
-                idAutor = resultSet.getInt("idAutor");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        idAutor = DBHandler.getId(getSelectString());
         return idAutor;
     }
 }

@@ -2,10 +2,7 @@ package Biblioteca;
 
 import DBManagement.DBHandler;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-
 public class Ejemplar {
     private int idEjemplar;
     private String codigoEjemplar;
@@ -43,32 +40,27 @@ public class Ejemplar {
         this.libro = libro;
     }
     public String getInsertString() {
-        return "INSERT INTO ejemplares (codigoEjemplar, idLibro) VALUES ('" + codigoEjemplar + "', '" + libro.getIdLibro() + "');";
+        return "INSERT INTO ejemplares (codigo_ejemplar, idLibro) VALUES ('" + codigoEjemplar + "', '" + libro.getIdLibro() + "');";
+    }
+    public String getSelectString() {
+        return "SELECT * FROM ejemplares WHERE idLibro = '" + libro.getIdLibro()
+                + "' AND codigo_ejemplar = '" + codigoEjemplar + "';";
+    }
+    public int getIdEjemplarFromDB() {
+        int idEjemplar;
+        idEjemplar = DBHandler.getId(getSelectString());
+        return idEjemplar;
     }
     private String generarCodigoEjemplar() {
         String codigoEjemplar = "";
+        char[] letras = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 
         for (int i = 0; i < 6; i++) {
-            codigoEjemplar += (int)(Math.random()*10)+ 1;
+            codigoEjemplar += (int)(Math.random()*10);
         }
         for (int i = 0; i < 2; i++) {
-            codigoEjemplar += (char)(Math.random() * 90 - 65) + 90;
+            codigoEjemplar += letras[(int)(Math.random() * 26)];
         }
-
         return codigoEjemplar;
-    }
-
-    public int getIdEjemplarFromDB(Connection connection) {
-        ResultSet resultSet = null;
-        int idEjemplar = 0;
-        resultSet = DBHandler.getResulset(connection, "SELECT idEjemplar FROM catalogo ORDER BY idEjemplar DESC LIMIT 1;");
-        try {
-            if (resultSet.next()) {
-                idEjemplar = resultSet.getInt("idEjemplar");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return idEjemplar;
     }
 }

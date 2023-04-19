@@ -1,8 +1,6 @@
 package Biblioteca;
 
 import DBManagement.DBHandler;
-import DBManagement.MySQLConnection;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -59,31 +57,25 @@ public class Libro {
         this.editorial = editorial;
     }
     public String getInsertString() {
-        return "INSERT INTO catalogo (titulo, idAutor, fechaPublicacion, editorial) VALUES ('"
+        return "INSERT INTO catalogo (titulo, idAutor, fecha_publicacion, editorial) VALUES ('"
                 + titulo + "', '" + autor.getIdAutor() + "', '" + fechaPublicacion + "', '" + editorial + "');";
     }
-    public boolean isRegistrado(Connection connection) {
+    public String getSelectString() {
+        return "SELECT * FROM catalogo WHERE titulo = '" + titulo
+                + "' AND idAutor = " + autor.getIdAutor()
+                + " AND fecha_publicacion = '" + fechaPublicacion
+                + "' AND editorial = '" + editorial + "';";
+    }
+    public boolean isRegistrado() {
         int numeroRegistros;
         boolean isRegistrado = false;
-        numeroRegistros = DBHandler.obtenerCantidadRegistros(connection,
-                "SELECT * FROM catalogo WHERE titulo = '" + titulo
-                        + "' AND idAutor = '" + autor.getIdAutor() + "' AND editorial = " + editorial
-                        + "' AND fecha_pblicacion = " + fechaPublicacion + "';");
+        numeroRegistros = DBHandler.obtenerCantidadRegistros(getSelectString());
         isRegistrado = numeroRegistros != 0 ? true : false;
-        return  isRegistrado;
+        return isRegistrado;
     }
-
-    public int getIdLibroFromDB(Connection connection) {
+    public int getIdLibroFromDB() {
         ResultSet resultSet = null;
-        int idLibro = 0;
-        resultSet = DBHandler.getResulset(connection, "SELECT idLibro FROM catalogo ORDER BY idLibro DESC LIMIT 1;");
-        try {
-            if (resultSet.next()) {
-                idLibro = resultSet.getInt("idLibro");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        int idLibro = DBHandler.getId(getSelectString());
         return idLibro;
     }
 }

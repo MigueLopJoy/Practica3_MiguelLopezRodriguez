@@ -1,13 +1,15 @@
 package DBManagement;
 
-import javax.swing.plaf.nimbus.State;
+import Gestion.Utils;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 public class DBHandler {
-    public static void executeQuery(Connection DBConnection, String sql) {
-        Connection connection = DBConnection;
+    public static void executeQuery(String sql) {
+        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
+        Connection connection = mySQLConnection.getConnection();
         Statement statement = null;
         ResultSet resultset = null;
 
@@ -26,8 +28,36 @@ public class DBHandler {
             }
         }
     }
-    public static void executeUpdate(Connection DBConnection, String sql) {
-        Connection connection = DBConnection;
+    public static int getId(String sql) {
+        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
+        Connection connection = mySQLConnection.getConnection();
+        Statement statement = null;
+        ResultSet resultset = null;
+        int id = -1;
+
+        try {
+            statement = connection.createStatement();
+            resultset = statement.executeQuery(sql);
+
+            if (resultset.next()) {
+                id = resultset.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                closeResultset(resultset);
+                closeStatement(statement);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return id;
+    }
+    public static void executeUpdate(String sql) {
+        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
+        Connection connection = mySQLConnection.getConnection();
         Statement statement = null;
         int result = 0;
 
@@ -35,7 +65,7 @@ public class DBHandler {
             statement = connection.createStatement();
             result = statement.executeUpdate(sql);
             if(result >= 1) {
-                System.out.println("Operacion realizada con exito");
+                System.out.println(Utils.obtenerMensajeExecuteUpdate(sql));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,8 +78,9 @@ public class DBHandler {
             }
         }
     }
-    public static ResultSet getResulset(Connection DBConnection, String sql) {
-        Connection connection = DBConnection;
+    public static ResultSet getResulset(String sql) {
+        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
+        Connection connection = mySQLConnection.getConnection();
         Statement statement = null;
         ResultSet resultset = null;
 
@@ -60,7 +91,6 @@ public class DBHandler {
             e.printStackTrace();
         } finally {
             try {
-                closeResultset(resultset);
                 closeStatement(statement);
                 connection.close();
             } catch (SQLException e) {
@@ -69,7 +99,9 @@ public class DBHandler {
         }
         return  resultset;
     }
-    public static int obtenerCantidadRegistros(Connection connection, String sql) {
+    public static int obtenerCantidadRegistros(String sql) {
+        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
+        Connection connection = mySQLConnection.getConnection();
         boolean hayRegistros = false;
         Statement statement = null;
         ResultSet resultSet = null;

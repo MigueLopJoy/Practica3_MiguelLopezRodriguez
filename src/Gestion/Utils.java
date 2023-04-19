@@ -74,4 +74,24 @@ public class Utils {
         }
         return numDias;
     }
+    public static String obtenerMensajeExecuteUpdate(String sql) {
+        String operacion = "";
+        String elementoInsertado = "";
+        String mensaje = "";
+
+        if (sql.indexOf("INSERT") != -1) {
+            operacion = "insertado";
+            if (sql.indexOf("autores") != -1) {
+                elementoInsertado = "autor";
+            } else if (sql.indexOf("catalogo") != -1) {
+                elementoInsertado = "libro";
+            } else if (sql.indexOf("ejemplares") != -1) {
+                elementoInsertado = "ejemplar";
+            } else if (sql.indexOf("lectores") != -1) {
+                elementoInsertado = "lector";
+            }
+        }
+        mensaje = "Nuevo " + elementoInsertado + " " + operacion + " con exito";
+        return  mensaje;
+    }
 }

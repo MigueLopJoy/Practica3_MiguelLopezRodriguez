@@ -2,54 +2,59 @@ package Gestion;
 
 import Biblioteca.Autor;
 import Biblioteca.Ejemplar;
-import Biblioteca.FechaPublicacion;
 import Biblioteca.Libro;
 import DBManagement.DBHandler;
-import DBManagement.MySQLConnection;
 import User.askForData;
 
-import java.sql.Connection;
 import java.time.LocalDate;
 
-public class Catalog {
-    Connection connection;
-
-    public Catalog(Connection connection) {
-        this.connection = connection;
-    }
-    public void registrarEjemplar() {
+public class Catalogo {
+    public static void registrarEjemplar() {
         Ejemplar ejemplar = null;
         Libro libro = null;
+        Autor autor = null;
+
         // Crear ejemplar - Pedir datos del ejemplar - Pedir datos del libro - Pedir datos del autor
         ejemplar = crearEjemplar();
         libro = ejemplar.getLibro();
+        autor = libro.getAutor();
+
+        // Comprobar si el autor esta registrarlo para asociarlo al objeto libro actual
+        if (autor.isRegistrado()){
+            libro.getAutor().setIdAutor(libro.getAutor().getIdAutorFromDB());
+        }
         // Comprobar si el libro asociado al ejemplar esta registrado
-        if (!libro.isRegistrado(connection)) {
+        if (!libro.isRegistrado()) {
             // Si no lo esta, crearlo y asociarlo al ejemplar.
             registrarLibro(libro);
+        } else {
+            // Si lo esta, vincular el objeto libro actual con su registro en la BBDD
+            libro.setIdLibro(libro.getIdLibroFromDB());
         }
-        DBHandler.executeUpdate(connection, ejemplar.getInsertString());
-        ejemplar.setIdEjemplar(crearEjemplar().getIdEjemplar());
+        DBHandler.executeUpdate(ejemplar.getInsertString());
     }
-    public void registrarLibro(Libro libro) {
+    public static void registrarLibro(Libro libro) {
         Autor autor = libro.getAutor();;
         // Comprobar si el autor asociado al libro esta registrado
-        if (!autor.isRegistrado(connection)){
-            // Si no lo esta, crearlo y asociarlo al libro.
+        if (!autor.isRegistrado()){
+            // Si no lo esta, crearlo y asociarlo al libro
             registrarAutor(autor);
+        } else {
+            // Si lo esta, vincular el objeto autor actual con su registro en la BBDD
+            autor.setIdAutor(autor.getIdAutorFromDB());
         }
         // Registrar libro
-        DBHandler.executeUpdate(connection, libro.getInsertString());
+        DBHandler.executeUpdate(libro.getInsertString());
         // Almacenar el id del libro asignado en la BBDD
-        libro.setIdLibro(libro.getIdLibroFromDB(connection));
+        libro.setIdLibro(libro.getIdLibroFromDB());
     }
-    public void registrarAutor(Autor autor) {
+    public static void registrarAutor(Autor autor) {
         // Registrar autor
-        DBHandler.executeUpdate(connection, autor.getInsertString());
+        DBHandler.executeUpdate(autor.getInsertString());
         // Almacenar el id del autor asignado en la BBDD
-        autor.setIdAutor(autor.getIdAutorFromDB(connection));
+        autor.setIdAutor(autor.getIdAutorFromDB());
     }
-    public Ejemplar crearEjemplar() {
+    public static Ejemplar crearEjemplar() {
         Ejemplar ejemplar = null;
         Libro libro = null;
 
@@ -58,7 +63,7 @@ public class Catalog {
         ejemplar = new Ejemplar(libro);
         return ejemplar;
     }
-    public Libro crearLibro() {
+    public static Libro crearLibro() {
         Libro libro = null;
         String titulo = "";
         Autor autor = null;
@@ -73,14 +78,14 @@ public class Catalog {
         return libro;
     }
 
-    public Autor crearAutor() {
+    public static Autor crearAutor() {
         Autor autor = null;
         String nombre = "";
         String apellido1 = "";
         String apellido2 = "";
 
         nombre = askForData.pedirString("Introduzca el nombre del autor");
-        apellido1 = askForData.pedirString("Introduzca elprimer  apellido del autor");
+        apellido1 = askForData.pedirString("Introduzca el primer apellido del autor");
         apellido2 = askForData.pedirString("Introduzca el segundo apellido del autor (Dejar en blanco si no lo tuviera)");
         autor = new Autor(nombre, apellido1, apellido2);
 
