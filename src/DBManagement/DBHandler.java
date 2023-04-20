@@ -4,7 +4,7 @@ import Biblioteca.Autor;
 import Biblioteca.Libro;
 import Gestion.Utils;
 import java.sql.*;
-import java.time.LocalDate;
+import java.time.Year;
 import java.util.ArrayList;
 public class DBHandler {
     public static ArrayList<Libro> getLibros(String sql) {
@@ -17,7 +17,7 @@ public class DBHandler {
         String titulo;
         Autor autor = null;
         int idAutor;
-        LocalDate fechaPublicacion;
+        Year añoPublicacion;
         String editorial;
 
         try {
@@ -27,9 +27,9 @@ public class DBHandler {
                 titulo = resultset.getString("titulo");
                 idAutor = resultset.getInt("idAutor");
                 autor = getAutores("SELECT * FROM autores WHERE idAutor = '" + idAutor + "';").get(0);
-                fechaPublicacion = resultset.getDate("fecha_publicacion").toLocalDate();
+                añoPublicacion = Year.of(resultset.getInt("año_publicacion"));
                 editorial = resultset.getString("editorial");
-                libro = new Libro(titulo, autor, fechaPublicacion, editorial);
+                libro = new Libro(titulo, autor, añoPublicacion, editorial);
                 libros.add(libro);
             }
         } catch (SQLException e) {
@@ -109,7 +109,32 @@ public class DBHandler {
         }
         return result;
     }
+    public static int getInt(String sql, int columnIndex) {
+        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
+        Connection connection = mySQLConnection.getConnection();
+        Statement statement = null;
+        ResultSet resultset = null;
+        int result = 0;
 
+        try {
+            statement = connection.createStatement();
+            resultset = statement.executeQuery(sql);
+            if (resultset.next()){
+                result = resultset.getInt(columnIndex);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                closeResultset(resultset);
+                closeStatement(statement);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
     public static String getString(String sql, String columnName) {
         MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
         Connection connection = mySQLConnection.getConnection();
@@ -122,6 +147,33 @@ public class DBHandler {
             resultset = statement.executeQuery(sql);
             if (resultset.next()){
                 result = resultset.getString(columnName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                closeResultset(resultset);
+                closeStatement(statement);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    public static String getString(String sql, int columnIndex) {
+        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
+        Connection connection = mySQLConnection.getConnection();
+        Statement statement = null;
+        ResultSet resultset = null;
+        String result = "";
+
+        try {
+            statement = connection.createStatement();
+            resultset = statement.executeQuery(sql);
+            if (resultset.next()){
+                result = resultset.getString(columnIndex);
             }
         } catch (SQLException e) {
             e.printStackTrace();

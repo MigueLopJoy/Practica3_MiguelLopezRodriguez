@@ -7,29 +7,31 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.Year;
+
 public class Libro {
     private int idLibro;
     private String titulo;
     private Autor autor;
-    private LocalDate fechaPublicacion;
+    private Year añoPublicacion;
     private String editorial;
 
     public Libro(){
         super();
     }
-    public Libro(String titulo, Autor autor, LocalDate fechaPublicacion, String editorial) {
+    public Libro(String titulo, Autor autor, Year añoPublicacion, String editorial) {
         super();
         this.titulo = titulo;
         this.autor = autor;
-        this.fechaPublicacion = fechaPublicacion;
+        this.añoPublicacion = añoPublicacion;
         this.editorial = editorial;
     }
-    public Libro(int idLibro, String titulo, Autor autor, LocalDate fechaPublicacion, String editorial) {
+    public Libro(int idLibro, String titulo, Autor autor, Year añoPublicacion, String editorial) {
         super();
         this.idLibro = idLibro;
         this.titulo = titulo;
         this.autor = autor;
-        this.fechaPublicacion = fechaPublicacion;
+        this.añoPublicacion = añoPublicacion;
         this.editorial = editorial;
     }
     public int getIdLibro() {
@@ -50,11 +52,11 @@ public class Libro {
     public void setAutor(Autor autor) {
         this.autor = autor;
     }
-    public LocalDate getFechaPublicacion() {
-        return fechaPublicacion;
+    public Year getAñoPublicacion() {
+        return añoPublicacion;
     }
-    public void setFechaPublicacion(LocalDate fechaPublicacion) {
-        this.fechaPublicacion = fechaPublicacion;
+    public void setAñoPublicacion(Year añoPublicacion) {
+        this.añoPublicacion = añoPublicacion;
     }
     public String getEditorial() {
         return editorial;
@@ -63,8 +65,8 @@ public class Libro {
         this.editorial = editorial;
     }
     public String getInsertString() {
-        return "INSERT INTO catalogo (titulo, idAutor, fecha_publicacion, editorial) VALUES ('"
-                + titulo + "', '" + autor.getIdAutor() + "', '" + fechaPublicacion + "', '" + editorial + "');";
+        return "INSERT INTO catalogo (titulo, idAutor, año_publicacion, editorial) VALUES ('"
+                + titulo + "', '" + autor.getIdAutor() + "', '" + añoPublicacion + "', '" + editorial + "');";
     }
 
     public void getDataFromDB() {
@@ -73,7 +75,7 @@ public class Libro {
     public String getSelectString() {
         return "SELECT * FROM catalogo WHERE titulo = '" + titulo
                 + "' AND idAutor = " + autor.getIdAutor()
-                + " AND fecha_publicacion = '" + fechaPublicacion
+                + " AND año_publicacion = '" + añoPublicacion
                 + "' AND editorial = '" + editorial + "';";
     }
     public boolean isRegistrado() {
