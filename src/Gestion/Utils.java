@@ -15,7 +15,6 @@ public class Utils {
         }
         return isNumeric;
     }
-
     public static int convertirEnNumero(String data) {
         int number = 0;
         try {
@@ -25,7 +24,6 @@ public class Utils {
         }
         return number;
     }
-
     public static int calcularDiasMes(int numeroMes) {
         int numDias = 0;
 
@@ -81,7 +79,6 @@ public class Utils {
         }
         return numDias;
     }
-
     public static String convertirMayuscula(String texto){
         String textoMayusculas = "";
         textoMayusculas = texto.toUpperCase().charAt(0) + texto.substring(1, texto.length());

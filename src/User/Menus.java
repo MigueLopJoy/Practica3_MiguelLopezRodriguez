@@ -71,10 +71,29 @@ public class Menus {
                     + " \n 1 - Consultar catalogo completo;" + "\n 2 - Formular busqueda;" + "\n 3 - Salir;");
             switch (option) {
                 case 1: {
-                    Catalogo.mostrarCatalogo();
+                    Catalogo.buscar(1);
                     break;
                 }
                 case 2: {
+                    do {
+                        option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
+                                + " \n 1 - Buscar por titulo;" + "\n 2 - Buscar por autor;" + "\n 3 - Salir;");
+                        switch (option) {
+                            case 1: {
+                                Catalogo.buscar(2);
+                                break;
+                            }
+                            case 2: {
+                                Catalogo.buscar(3);
+                                break;
+                            }
+                            case 3: {
+                                salir = true;
+                                break;
+                            }
+                        }
+                    } while (!salir);
+                    salir = false;
                     break;
                 }
                 case 3: {

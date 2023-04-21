@@ -6,25 +6,55 @@ import Biblioteca.Libro;
 import DBManagement.DBHandler;
 import User.pedirDatos;
 
-import java.time.LocalDate;
+import java.lang.reflect.Array;
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Catalogo {
-    public static void buscar(){
+    public static void buscar(int option){
+        ArrayList<Libro> libros;
+        Autor autor;
+        String sql;
+        String tituloLibro;
 
+        switch (option) {
+            case 1: {
+                libros = DBHandler.getLibros("SELECT * FROM catalogo");
+                mostrarLibros(libros);
+                break;
+            }
+            case 2: {
+                tituloLibro = pedirDatos.pedirString("Introduzca el titulo del libro");
+                sql = "SELECT * FROM catalogo WHERE titulo = '" + tituloLibro + "';";
+                libros = DBHandler.getLibros(sql);
+                mostrarLibros(libros);
+                break;
+            }
+            case 3: {
+                autor = crearAutor();
+                sql = "SELECT * FROM catalogo c INNER JOIN autores a ON c.idAutor = a.idAutor WHERE nombre = '"
+                        + autor.getNombre() + "' AND apellido1 = '" + autor.getApellido1() + "' AND apellido2 = '"
+                        + autor.getApellido2() + "';";
+                libros = DBHandler.getLibros(sql);
+                mostrarLibros(libros);
+                break;
+            }
+        }
     }
-    public static void mostrarCatalogo() {
-        ArrayList<Libro> libros = DBHandler.getLibros("SELECT * FROM catalogo");
+    private static void mostrarLibros(ArrayList<Libro> libros) {
         Autor autor;
         String mensaje;
 
-        System.out.println(getMensajeCantidadLibros(getCantidadRegistrosTabla("catalogo")));
+        // Ordenar alfabeticamente por titulos los libros obtendios en la busqueda
+        Collections.sort(libros);
+
+        System.out.println("Libros encontrados: " + libros.size());
         for (Libro libro : libros) {
             autor = libro.getAutor();
             mensaje = " - " + libro.getTitulo() + " / " + autor.getNombre() +  " " + autor.getApellido1() + " "
                     + autor.getApellido2() + " - " + libro.getEditorial() + ", " + libro.getAñoPublicacion()
-                    + " (" + getNumEjemplaresEditorial(libro.getEditorial()) + " ejemplares)";
+                    + " (Ejemplares: " + getNumEjemplaresEditorial(libro.getEditorial()) + ")";
             System.out.println(mensaje);
         }
     }
@@ -44,18 +74,6 @@ public class Catalogo {
         String sql = "SELECT COUNT(*) FROM " + table;
         cantidadEjemplares = DBHandler.getInt(sql, 1);
         return  cantidadEjemplares;
-    }
-    public static String getMensajeCantidadLibros(int cantidadLibros) {
-        String mensaje;
-
-        if (cantidadLibros == 0) {
-            mensaje = "La biblioteca no tiene libros en catalogo;";
-        } else if (cantidadLibros == 1) {
-            mensaje = "La biblioteca cuenta con 1 libro en catalogo;";
-        } else {
-            mensaje = "La biblioteca cuenta con " + cantidadLibros + " libros en catalogo;";
-        }
-        return  mensaje;
     }
     public static void registrarEjemplar() {
         Ejemplar ejemplar = null;

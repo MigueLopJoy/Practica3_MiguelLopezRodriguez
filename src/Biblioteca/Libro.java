@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Year;
 
-public class Libro {
+public class Libro implements Comparable<Libro>{
     private int idLibro;
     private String titulo;
     private Autor autor;
@@ -68,10 +68,6 @@ public class Libro {
         return "INSERT INTO catalogo (titulo, idAutor, año_publicacion, editorial) VALUES ('"
                 + titulo + "', '" + autor.getIdAutor() + "', '" + añoPublicacion + "', '" + editorial + "');";
     }
-
-    public void getDataFromDB() {
-
-    }
     public String getSelectString() {
         return "SELECT * FROM catalogo WHERE titulo = '" + titulo
                 + "' AND idAutor = " + autor.getIdAutor()
@@ -89,5 +85,9 @@ public class Libro {
         ResultSet resultSet = null;
         int idLibro = DBHandler.getInt(getSelectString(), "idLibro");
         return idLibro;
+    }
+    @Override
+    public int compareTo(Libro libro) {
+        return libro.getTitulo().compareTo(this.titulo);
     }
 }

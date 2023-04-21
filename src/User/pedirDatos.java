@@ -19,6 +19,7 @@ public class pedirDatos {
 		do {
 			nombre = pedirDatos.pedirString(texto);
 			if (nombre != "") {
+				nombre = nombre.trim();
 				nombre = Utils.convertirMayuscula(nombre);
 			}
 		} while (!Utils.validarNombre(nombre));
