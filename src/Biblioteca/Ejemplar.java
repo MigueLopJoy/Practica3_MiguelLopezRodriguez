@@ -1,17 +1,25 @@
 package Biblioteca;
 
 import DBManagement.DBHandler;
-
-import java.sql.ResultSet;
-public class Ejemplar {
+public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
     private int idEjemplar;
     private String codigoEjemplar;
     private Libro libro;
     public Ejemplar(Libro libro) {
+        super();
         this.codigoEjemplar = generarCodigoEjemplar();
         this.libro = libro;
+        this.idEjemplar = getIdFromDB();
+    }
+
+    public Ejemplar(String codigoEjemplar, Libro libro) {
+        super();
+        this.codigoEjemplar = codigoEjemplar;
+        this.libro = libro;
+        this.idEjemplar = getIdFromDB();
     }
     public Ejemplar(int idEjemplar, String codigoEjemplar, int idLibro) {
+        super();
         this.idEjemplar = idEjemplar;
         this.codigoEjemplar = codigoEjemplar;
         this.libro = libro;
@@ -46,10 +54,52 @@ public class Ejemplar {
         return "SELECT * FROM ejemplares WHERE idLibro = '" + libro.getIdLibro()
                 + "' AND codigo_ejemplar = '" + codigoEjemplar + "';";
     }
-    public int getIdEjemplarFromDB() {
-        int idEjemplar;
-        idEjemplar = DBHandler.getInt(getSelectString(), "idEjemplar");
+    @Override
+    public String getUpdateString() {
+        return "";
+    }
+    @Override
+    public String getDeleteString() {
+        return "DELETE FROM ejemplares WHERE codigoEjemplar = " + codigoEjemplar;
+    }
+    @Override
+    public boolean isRegistrado() {
+        return DBHandler.hayRegistros(getSelectString());
+    }
+    @Override
+    public int getIdFromDB() {
+        return DBHandler.getInt(getSelectString(), 1);
+    }
+    @Override
+    public int setIdFromDB() {
+        int idEjemplar = 0;
+        if (isRegistrado()) {
+            idEjemplar = getIdFromDB();
+        }
         return idEjemplar;
+    }
+    @Override
+    public String toString() {
+        return codigoEjemplar + " - " + libro.toString();
+    }
+    @Override
+    public int compareTo(Ejemplar ejemplar) {
+        int resultadoComparacion;
+
+        resultadoComparacion = libro.getTitulo().compareTo(ejemplar.getLibro().getTitulo());
+        if (resultadoComparacion == 0) {
+            resultadoComparacion = libro.getAutor().getNombre().compareTo(ejemplar.getLibro().getAutor().getNombre());
+            if (resultadoComparacion == 0) {
+                resultadoComparacion = libro.getAutor().getApellido1().compareTo(ejemplar.getLibro().getAutor().getApellido1());
+                if (resultadoComparacion == 0) {
+                    resultadoComparacion = libro.getAutor().getApellido2().compareTo(ejemplar.getLibro().getAutor().getApellido2());
+                    if (resultadoComparacion == 0) {
+                        resultadoComparacion = codigoEjemplar.compareTo(ejemplar.codigoEjemplar);
+                    }
+                }
+            }
+        }
+        return resultadoComparacion;
     }
     private String generarCodigoEjemplar() {
         String codigoEjemplar = "";

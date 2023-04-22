@@ -1,21 +1,15 @@
 package Biblioteca;
 
 import DBManagement.DBHandler;
-import User.pedirDatos;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.Year;
 
-public class Libro implements Comparable<Libro>{
+public class Libro implements Comparable<Libro>, ElementoBiblioteca {
     private int idLibro;
     private String titulo;
     private Autor autor;
     private Year añoPublicacion;
     private String editorial;
-
     public Libro(){
         super();
     }
@@ -25,14 +19,7 @@ public class Libro implements Comparable<Libro>{
         this.autor = autor;
         this.añoPublicacion = añoPublicacion;
         this.editorial = editorial;
-    }
-    public Libro(int idLibro, String titulo, Autor autor, Year añoPublicacion, String editorial) {
-        super();
-        this.idLibro = idLibro;
-        this.titulo = titulo;
-        this.autor = autor;
-        this.añoPublicacion = añoPublicacion;
-        this.editorial = editorial;
+        this.idLibro = setIdFromDB();
     }
     public int getIdLibro() {
         return idLibro;
@@ -74,17 +61,30 @@ public class Libro implements Comparable<Libro>{
                 + " AND año_publicacion = '" + añoPublicacion
                 + "' AND editorial = '" + editorial + "';";
     }
-    public boolean isRegistrado() {
-        int numeroRegistros;
-        boolean isRegistrado = false;
-        numeroRegistros = DBHandler.obtenerCantidadRegistros(getSelectString());
-        isRegistrado = numeroRegistros != 0 ? true : false;
-        return isRegistrado;
+    public String getUpdateString() {
+        return "UPDATE catalogo SET titulo = '" + titulo
+                + "', idAutor = " + autor.getIdAutor()
+                + "', año_publicacion = " + añoPublicacion
+                + ", editorial = '" + editorial + "' WHERE idLibro = " + idLibro;
     }
-    public int getIdLibroFromDB() {
-        ResultSet resultSet = null;
-        int idLibro = DBHandler.getInt(getSelectString(), "idLibro");
+    public String getDeleteString() {
+        return "DELETE FROM ejemplares WHERE idLibro = " + idLibro;
+    }
+    public boolean isRegistrado() {
+        return DBHandler.hayRegistros(getSelectString());
+    }
+    public int getIdFromDB() {
+        return DBHandler.getInt(getSelectString(), "idLibro");
+    }
+    public int setIdFromDB() {
+        int idLibro = 0;
+        if (isRegistrado()) {
+            idLibro = getIdFromDB();
+        }
         return idLibro;
+    }
+    public String toString() {
+        return titulo + " / " + autor.toString() + " - " + editorial + ", " + añoPublicacion;
     }
     @Override
     public int compareTo(Libro libro) {

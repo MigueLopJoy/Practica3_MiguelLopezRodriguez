@@ -18,11 +18,9 @@ public class pedirDatos {
 		String nombre;
 		do {
 			nombre = pedirDatos.pedirString(texto);
-			if (nombre != "") {
-				nombre = nombre.trim();
-				nombre = Utils.convertirMayuscula(nombre);
-			}
+			nombre = nombre.trim();
 		} while (!Utils.validarNombre(nombre));
+		nombre = Utils.convertirMayuscula(nombre);
 		return nombre;
 	}
 	public static String pedirString(String texto) {
@@ -40,6 +38,30 @@ public class pedirDatos {
 		}
 		retorno = scanner.nextInt();
 		scanner.nextLine();
+		return retorno;
+	}
+	public static int pedirInt(int min, int max) {
+		int retorno;
+		int corrector;
+
+		// Intercambia los valores de los parametros min y max si es necesario
+		if (min > max) {
+			corrector = max;
+			max = Math.max(max, min);
+			min = Math.min(corrector, min);
+		}
+
+		do {
+			while (!scanner.hasNextInt()) {
+				System.out.println("Debe introducir un numero");
+				scanner.next();
+			}
+			retorno = scanner.nextInt();
+			scanner.nextLine();
+			if (retorno < min || retorno > max) {
+				System.out.println("Numero fuera de rango");
+			}
+		} while (retorno < min || retorno > max);
 		return retorno;
 	}
 	public static int pedirInt(String texto, int min, int max) {

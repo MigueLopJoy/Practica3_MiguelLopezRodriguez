@@ -1,7 +1,6 @@
 package User;
 
 import Gestion.Catalogo;
-
 public class Menus {
     public static void mainMenu() {
         int option;
@@ -13,11 +12,11 @@ public class Menus {
                     + "\n 3 - Circulacion;" + "\n 4 - Salir;");
             switch (option) {
                 case 1: {
-                    catalogMenu();
+                    menuCatalogo();
                     break;
                 }
                 case 2: {
-                    System.out.println("Sin implementar");
+                    menuLectores();
                     break;
                 }
                 case 3: {
@@ -31,7 +30,8 @@ public class Menus {
             }
         } while (!salir);
     }
-    public static void catalogMenu() {
+
+    public static void menuCatalogo() {
         int option;
         boolean salir = false;
 
@@ -49,7 +49,7 @@ public class Menus {
                     break;
                 }
                 case 3: {
-                    System.out.println("Sin implementar");
+                    menuActualizarCatalogo();
                     break;
                 }
                 case 4: {
@@ -62,7 +62,7 @@ public class Menus {
             }
         } while (!salir);
     }
-    public static void menuBusquedaCatalogo() {
+    private static void menuBusquedaCatalogo() {
         int option;
         boolean salir = false;
 
@@ -71,7 +71,7 @@ public class Menus {
                     + " \n 1 - Consultar catalogo completo;" + "\n 2 - Formular busqueda;" + "\n 3 - Salir;");
             switch (option) {
                 case 1: {
-                    Catalogo.buscar(1);
+                    Catalogo.consultarCatalogo(1);
                     break;
                 }
                 case 2: {
@@ -80,11 +80,11 @@ public class Menus {
                                 + " \n 1 - Buscar por titulo;" + "\n 2 - Buscar por autor;" + "\n 3 - Salir;");
                         switch (option) {
                             case 1: {
-                                Catalogo.buscar(2);
+                                Catalogo.consultarCatalogo(2);
                                 break;
                             }
                             case 2: {
-                                Catalogo.buscar(3);
+                                Catalogo.consultarCatalogo(3);
                                 break;
                             }
                             case 3: {
@@ -97,6 +97,59 @@ public class Menus {
                     break;
                 }
                 case 3: {
+                    salir = true;
+                    break;
+                }
+            }
+        } while (!salir);
+    }
+    private static void menuActualizarCatalogo() {
+        int option;
+        boolean salir = false;
+        do {
+            option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
+                    + " \n 1 - Modificar libro;" + "\n 2 - Modificar autor;" + "\n 3 - Salir;");
+            switch (option) {
+                case 1: {
+                    Catalogo.actualizar(1);
+                    break;
+                }
+                case 2: {
+                    Catalogo.actualizar(2);
+                    break;
+                }
+                case 3: {
+                    salir = true;
+                    break;
+                }
+            }
+        } while (!salir);
+    }
+    private static void menuLectores() {
+        int option;
+        boolean salir = false;
+
+        do {
+            option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
+                    + " \n 1 - Buscar lector;" + "\n 2 - Dar de alta lector;"
+                    + "\n 3 - Modificar datos de lector" + "\n 4 - Dar de baja lector" + "\n 5 - Salir;");
+            switch (option) {
+                case 1: {
+                    System.out.println("Sin implementar");
+                    break;
+                }
+                case 2: {
+                    System.out.println("Sin implementar");
+                    break;
+                }
+                case 3: {
+                    System.out.println("Sin implementar");
+                    break;
+                }
+                case 4: {
+                    System.out.println("Sin implementar");
+                }
+                case 5: {
                     salir = true;
                     break;
                 }

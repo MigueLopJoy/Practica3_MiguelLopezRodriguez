@@ -1,21 +1,57 @@
 package DBManagement;
 
 import Biblioteca.Autor;
+import Biblioteca.Ejemplar;
 import Biblioteca.Libro;
 import Gestion.Utils;
 import java.sql.*;
 import java.time.Year;
 import java.util.ArrayList;
 public class DBHandler {
+
+    public static ArrayList<Ejemplar> getEjemplares(String sql) {
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
+        ArrayList<Ejemplar> ejemplares = new ArrayList<Ejemplar>();
+        Statement statement = null;
+        ResultSet resultset = null;
+        Ejemplar ejemplar;
+        String codigoEjemplar;
+        Libro libro;
+        int idLibro;
+
+        try {
+            statement = connection.createStatement();
+            resultset = statement.executeQuery(sql);
+            while (resultset.next()){
+                codigoEjemplar = resultset.getString("codigo_ejemplar");
+                idLibro = resultset.getInt("idLibro");
+                libro = getLibros("SELECT * FROM libros WHERE idLibro = " + idLibro + ";").get(0);
+                ejemplar = new Ejemplar(codigoEjemplar, libro);
+                ejemplares.add(ejemplar);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                closeResultset(resultset);
+                closeStatement(statement);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return ejemplares;
+    }
     public static ArrayList<Libro> getLibros(String sql) {
-        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
-        Connection connection = mySQLConnection.getConnection();
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
         ArrayList<Libro> libros = new ArrayList<Libro>();
         Statement statement = null;
         ResultSet resultset = null;
-        Libro libro = null;
+        Libro libro;
         String titulo;
-        Autor autor = null;
+        Autor autor;
         int idAutor;
         Year añoPublicacion;
         String editorial;
@@ -26,7 +62,7 @@ public class DBHandler {
             while (resultset.next()){
                 titulo = resultset.getString("titulo");
                 idAutor = resultset.getInt("idAutor");
-                autor = getAutores("SELECT * FROM autores WHERE idAutor = '" + idAutor + "';").get(0);
+                autor = getAutores("SELECT * FROM autores WHERE idAutor = " + idAutor + ";").get(0);
                 añoPublicacion = Year.of(resultset.getInt("año_publicacion"));
                 editorial = resultset.getString("editorial");
                 libro = new Libro(titulo, autor, añoPublicacion, editorial);
@@ -46,12 +82,12 @@ public class DBHandler {
         return libros;
     }
     public static ArrayList<Autor> getAutores(String sql) {
-        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
-        Connection connection = mySQLConnection.getConnection();
-        ArrayList<Autor> autores = new ArrayList<Autor>();
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
         Statement statement = null;
         ResultSet resultset = null;
-        Autor autor = null;
+        ArrayList<Autor> autores = new ArrayList<Autor>();
+        Autor autor;
         String nombre;
         String apellido1;
         String apellido2;
@@ -64,10 +100,10 @@ public class DBHandler {
                 apellido1 = resultset.getString("apellido1");
                 if (resultset.getString("apellido2") != null) {
                     apellido2 = resultset.getString("apellido2");
+                    autor = new Autor(nombre, apellido1, apellido2);
                 } else {
-                    apellido2 = "";
+                    autor = new Autor(nombre, apellido1);
                 }
-                autor = new Autor(nombre, apellido1, apellido2);
                 autores.add(autor);
             }
         } catch (SQLException e) {
@@ -84,8 +120,8 @@ public class DBHandler {
         return autores;
     }
     public static int getInt(String sql, String columnName) {
-        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
-        Connection connection = mySQLConnection.getConnection();
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
         Statement statement = null;
         ResultSet resultset = null;
         int result = 0;
@@ -110,8 +146,8 @@ public class DBHandler {
         return result;
     }
     public static int getInt(String sql, int columnIndex) {
-        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
-        Connection connection = mySQLConnection.getConnection();
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
         Statement statement = null;
         ResultSet resultset = null;
         int result = 0;
@@ -136,8 +172,8 @@ public class DBHandler {
         return result;
     }
     public static String getString(String sql, String columnName) {
-        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
-        Connection connection = mySQLConnection.getConnection();
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
         Statement statement = null;
         ResultSet resultset = null;
         String result = "";
@@ -161,10 +197,9 @@ public class DBHandler {
         }
         return result;
     }
-
     public static String getString(String sql, int columnIndex) {
-        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
-        Connection connection = mySQLConnection.getConnection();
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
         Statement statement = null;
         ResultSet resultset = null;
         String result = "";
@@ -188,9 +223,34 @@ public class DBHandler {
         }
         return result;
     }
+    public static boolean hayRegistros(String sql) {
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
+        boolean hayRegistros = false;
+        Statement statement = null;
+        ResultSet resultSet;
+
+        try {
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                hayRegistros = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                closeStatement(statement);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return hayRegistros;
+    }
     public static void executeUpdate(String sql) {
-        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
-        Connection connection = mySQLConnection.getConnection();
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
         Statement statement = null;
         int result = 0;
 
@@ -210,32 +270,6 @@ public class DBHandler {
                 e.printStackTrace();
             }
         }
-    }
-    public static int obtenerCantidadRegistros(String sql) {
-        MySQLConnection mySQLConnection = new MySQLConnection("root", "1234");
-        Connection connection = mySQLConnection.getConnection();
-        boolean hayRegistros = false;
-        Statement statement = null;
-        ResultSet resultSet = null;
-        int numeroRegistros = 0;
-
-        try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
-            if (resultSet.next()) {
-                numeroRegistros++;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                closeStatement(statement);
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return numeroRegistros;
     }
     public static void closeStatement(Statement statement) {
         try {

@@ -1,5 +1,8 @@
 package Biblioteca;
-public class Direccion {
+
+import DBManagement.DBHandler;
+
+public class Direccion implements ElementoBiblioteca {
     private int idDireccion;
     private String tripoVia;
     private String nombreVia;
@@ -109,6 +112,37 @@ public class Direccion {
     public void setProvincia(String provincia) {
         this.provincia = provincia;
     }
-
-
+    @Override
+    public String getInsertString() {
+        return null;
+    }
+    @Override
+    public String getSelectString() {
+        return null;
+    }
+    @Override
+    public String getUpdateString() {
+        return null;
+    }
+    public String getDeleteString() {
+        return "DELETE FROM ejemplares WHERE idDireccion = " + idDireccion;
+    }
+    @Override
+    public boolean isRegistrado() {
+        return DBHandler.hayRegistros(getSelectString());
+    }
+    @Override
+    public int getIdFromDB() {
+        int idDireccion = 0;
+        idDireccion = DBHandler.getInt(getSelectString(), 1);
+        return idDireccion;
+    }
+    @Override
+    public int setIdFromDB() {
+        int id = 0;
+        if (isRegistrado()) {
+            id = getIdFromDB();
+        }
+        return id;
+    }
 }

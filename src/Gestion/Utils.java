@@ -1,99 +1,21 @@
 package Gestion;
 
-import Biblioteca.Autor;
-
-import java.lang.reflect.Array;
-import java.util.Arrays;
-
 public class Utils {
-    public static boolean isNumeric(String data) {
-        boolean isNumeric = true;
-        try {
-            Integer.parseInt(data);
-        } catch (NumberFormatException e) {
-            isNumeric = false;
-        }
-        return isNumeric;
-    }
-    public static int convertirEnNumero(String data) {
-        int number = 0;
-        try {
-            number = Integer.parseInt(data);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-        return number;
-    }
-    public static int calcularDiasMes(int numeroMes) {
-        int numDias = 0;
-
-        switch (numeroMes) {
-            case 1: {
-                numDias = 31;
-                break;
-            }
-            case 2: {
-                numDias = 28;
-                break;
-            }
-            case 3: {
-                numDias = 31;
-                break;
-            }
-            case 4: {
-                numDias = 30;
-                break;
-            }
-            case 5: {
-                numDias = 31;
-                break;
-            }
-            case 6: {
-                numDias = 30;
-                break;
-            }
-            case 7: {
-                numDias = 31;
-                break;
-            }
-            case 8: {
-                numDias = 31;
-                break;
-            }
-            case 9: {
-                numDias = 30;
-                break;
-            }
-            case 10: {
-                numDias = 31;
-                break;
-            }
-            case 11: {
-                numDias = 30;
-                break;
-            }
-            case 12: {
-                numDias = 31;
-                break;
-            }
-        }
-        return numDias;
-    }
-    public static String convertirMayuscula(String texto){
+    public static String convertirMayuscula(String texto) {
         String textoMayusculas = "";
         textoMayusculas = texto.toUpperCase().charAt(0) + texto.substring(1, texto.length());
         return textoMayusculas;
     }
+
     public static boolean validarNombre(String nombre) {
         boolean nombreValido = true;
 
-        if (nombre != ""){
-            if (!nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ&\\s]+$")) {
-                nombreValido = false;
-            }
+        if (!nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ&]+((\\s[a-zA-ZáéíóúÁÉÍÓÚñÑ&]+)+)?$")) {
+            nombreValido = false;
         }
         return nombreValido;
     }
+
     public static String obtenerMensajeExecuteUpdate(String sql) {
         String operacion = "";
         String elementoInsertado = "";
@@ -101,17 +23,23 @@ public class Utils {
 
         if (sql.indexOf("INSERT") != -1) {
             operacion = "insertado";
-            if (sql.indexOf("autores") != -1) {
-                elementoInsertado = "autor";
-            } else if (sql.indexOf("catalogo") != -1) {
-                elementoInsertado = "libro";
-            } else if (sql.indexOf("ejemplares") != -1) {
-                elementoInsertado = "ejemplar";
-            } else if (sql.indexOf("lectores") != -1) {
-                elementoInsertado = "lector";
-            }
+        } else if (sql.indexOf("UPDATE") != -1) {
+            operacion = "actualizado";
+        } else if (sql.indexOf("DELETE") != -1) {
+            operacion = "eliminado";
         }
-        mensaje = "Nuevo " + elementoInsertado + " " + operacion + " con exito";
+
+        if (sql.indexOf("autores") != -1) {
+            elementoInsertado = "autor";
+        } else if (sql.indexOf("catalogo") != -1) {
+            elementoInsertado = "libro";
+        } else if (sql.indexOf("ejemplares") != -1) {
+            elementoInsertado = "ejemplar";
+        } else if (sql.indexOf("lectores") != -1) {
+            elementoInsertado = "lector";
+        }
+
+        mensaje = elementoInsertado + " " + operacion + " con exito";
         return mensaje;
     }
 }
