@@ -1,14 +1,10 @@
 package User;
 import Gestion.Utils;
-
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.MonthDay;
 import java.time.Year;
-import java.util.ArrayList;
 import java.util.Scanner;
 public class pedirDatos {
 	private static Scanner scanner = new Scanner(System.in);
+
 	public static Year pedirAño(String texto) {
 		Year año;
 		año = Year.of(pedirInt(texto, 1500, 2022));
@@ -23,11 +19,19 @@ public class pedirDatos {
 		nombre = Utils.convertirMayuscula(nombre);
 		return nombre;
 	}
+
 	public static String pedirString(String texto) {
-		System.out.println(texto + "\n");
-		String retorno = scanner.nextLine();
+		String retorno;
+		do {
+			System.out.println(texto + "\n");
+			retorno = scanner.nextLine();
+			if (retorno.isEmpty() || retorno.trim().isEmpty()) {
+				System.out.println("Debe introducir algún dato");
+			}
+		} while (retorno.isEmpty() || retorno.trim().isEmpty());
 		return retorno;
 	}
+
 	public static int pedirInt(String texto) {
 		int retorno;
 		System.out.print(texto + "\n");
@@ -40,6 +44,7 @@ public class pedirDatos {
 		scanner.nextLine();
 		return retorno;
 	}
+
 	public static int pedirInt(int min, int max) {
 		int retorno;
 		int corrector;
@@ -64,6 +69,7 @@ public class pedirDatos {
 		} while (retorno < min || retorno > max);
 		return retorno;
 	}
+
 	public static int pedirInt(String texto, int min, int max) {
 		int retorno;
 		int corrector;
@@ -89,12 +95,21 @@ public class pedirDatos {
 		} while (retorno < min || retorno > max);
 		return retorno;
 	}
+
 	public static boolean confirmacion(String texto) {
-		char confirmacion;
+		String userInput;
+		char confirmacion = ' ';
         boolean confirmado = false;
 		do {
 			System.out.println(texto);
-			confirmacion = scanner.nextLine().charAt(0);
+			if ((userInput = scanner.nextLine()).matches("[a-zA-Z]")){
+				confirmacion = userInput.charAt(0);
+				if (confirmacion != 's' && confirmacion != 'n') {
+					System.out.println("El dato introducido no se corresponde con el solicitado");
+				}
+			} else {
+				System.out.println("Dato no valido");
+			}
 		} while (confirmacion != 's' && confirmacion != 'n');
 
 		if (confirmacion == 's') {

@@ -1,31 +1,85 @@
 package DBManagement;
 
-import Biblioteca.Autor;
-import Biblioteca.Ejemplar;
-import Biblioteca.Libro;
+import Biblioteca.*;
+import Gestion.Lectores;
 import Gestion.Utils;
 import java.sql.*;
 import java.time.Year;
 import java.util.ArrayList;
 public class DBHandler {
 
-    public static ArrayList<Ejemplar> getEjemplares(String sql) {
+    public static ArrayList<Lector> getLectores(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
-        ArrayList<Ejemplar> ejemplares = new ArrayList<Ejemplar>();
+        ArrayList<Lector> lectores = new ArrayList<Lector>();
         Statement statement = null;
         ResultSet resultset = null;
-        Ejemplar ejemplar;
-        String codigoEjemplar;
-        Libro libro;
-        int idLibro;
+        Lector lector;
+        Direccion direccion;
+        String nombre;
+        String apellido1;
+        String apellido2;
+        String numeroLector;
+        String telefono;
+        String email;
+        Direccion direccion;
+        int idDireccion;
 
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
             while (resultset.next()){
-                codigoEjemplar = resultset.getString("codigo_ejemplar");
-                idLibro = resultset.getInt("idLibro");
+                nombre = resultset.getString("nombre");
+                apellido1 = resultset.getString("apellido1");
+                apellido2 = resultset.getString("apellido2");
+                numeroLector = resultset.getString("numero_lector");
+                telefono = resultset.getString("telefono");
+                email = resultset.getString("email");
+                idDireccion = resultset.getInt("idDireccion");
+                direccion = getDirecciones("SELECT * FROM direcciones WHERE idDireccion = " + idDireccion + ";").get(0);
+                lector = new Lector(nombre, apellido1, apellido2, numeroLector, telefono, email, idDireccion);
+                lectores.add(lector);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                closeResultset(resultset);
+                closeStatement(statement);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return lectores;
+    }
+    public static ArrayList<Direccion> getDirecciones(String sql) {
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
+        ArrayList<Direccion> direcciones = new ArrayList<Direccion>();
+        Statement statement = null;
+        ResultSet resultset = null;
+        Direccion direccion;
+        String nombre;
+        String apellido1;
+        String apellido2;
+        String numeroLector;
+        String telefono;
+        String email;
+        int idDireccion;
+
+        try {
+            statement = connection.createStatement();
+            resultset = statement.executeQuery(sql);
+            while (resultset.next()){
+                nombre = resultset.getString("nombre");
+                apellido1 = resultset.getString("apellido1");
+                apellido2 = resultset.getString("apellido2");
+                numeroLector = resultset.getString("numero_lector");
+                telefono = resultset.getString("telefono");
+                idDireccion = resultset.getInt("idDireccion");
+                direccion = getDirecciones("SELECT * FROM direcciones WHERE idDireccion = " + idDireccion + ";");
+                telefono = resultset.getString("telefono");
                 libro = getLibros("SELECT * FROM libros WHERE idLibro = " + idLibro + ";").get(0);
                 ejemplar = new Ejemplar(codigoEjemplar, libro);
                 ejemplares.add(ejemplar);
@@ -41,7 +95,7 @@ public class DBHandler {
                 e.printStackTrace();
             }
         }
-        return ejemplares;
+        return direcciones;
     }
     public static ArrayList<Libro> getLibros(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");

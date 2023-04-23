@@ -33,7 +33,7 @@ public class Autor extends Persona implements Comparable<Autor>, ElementoBibliot
                     + "', apellido2 = '" + getApellido2() + "' WHERE idAutor = " + idAutor;
     }
     public String getDeleteString() {
-        return "DELETE FROM ejemplares WHERE idAutor = " + idAutor;
+        return "DELETE FROM autores WHERE idAutor = " + idAutor;
     }
     public boolean isRegistrado() {
         return DBHandler.hayRegistros(getSelectString());
@@ -53,7 +53,7 @@ public class Autor extends Persona implements Comparable<Autor>, ElementoBibliot
     public String toString() {
         String toString;
 
-        if (getApellido2() == null) {
+        if (getApellido2() != null) {
             toString = getNombre() + " " + getApellido1() + " " + getApellido2();
         } else {
             toString = getNombre() + " " + getApellido1();

@@ -12,9 +12,13 @@ import java.util.Collections;
 
 public class Catalogo {
     public static void consultarCatalogo(int option) {
-        ArrayList<Libro> libros = buscar(option);
-        System.out.println("Libros encontrados: " + libros.size());
-        mostrarLibros(libros);
+        if (DBHandler.hayRegistros("SELECT * FROM catalogo")) {
+            ArrayList<Libro> libros = buscar(option);
+            System.out.println("Libros encontrados: " + libros.size());
+            mostrarLibros(libros);
+        } else {
+            System.out.println("No hay registros disponibles");
+        }
     }
     private static ArrayList<Libro> buscar(int option) {
         ArrayList<Libro> libros = new ArrayList<Libro>();
@@ -96,17 +100,21 @@ public class Catalogo {
         String sql;
         int idLibro;
 
-        libro = escogerLibro("SELECT * FROM catalogo");
-        idLibro = libro.getIdFromDB();
-        System.out.println("Nuevos datos del libro:");
-        nuevosDatos = crearLibro();
-        nuevosDatos.setIdLibro(idLibro);
-        if (!nuevosDatos.getAutor().isRegistrado()) {
-            nuevosDatos.getAutor().setIdAutor(libro.getAutor().getIdAutor());
-            DBHandler.executeUpdate(nuevosDatos.getAutor().getUpdateString());
+        if (DBHandler.hayRegistros("SELECT * FROM catalogo")) {
+            libro = escogerLibro("SELECT * FROM catalogo");
+            idLibro = libro.getIdFromDB();
+            System.out.println("Nuevos datos del libro:");
+            nuevosDatos = crearLibro();
+            nuevosDatos.setIdLibro(idLibro);
+            if (!nuevosDatos.getAutor().isRegistrado()) {
+                nuevosDatos.getAutor().setIdAutor(libro.getAutor().getIdAutor());
+                DBHandler.executeUpdate(nuevosDatos.getAutor().getUpdateString());
+            }
+            sql = nuevosDatos.getUpdateString();
+            DBHandler.executeUpdate(sql);
+        } else {
+            System.out.println("No hay libros registrados");
         }
-        sql = nuevosDatos.getUpdateString();
-        DBHandler.executeUpdate(sql);
     }
     private static void actualizarAutor() {
         Autor autor;
@@ -114,13 +122,17 @@ public class Catalogo {
         String sql;
         int idAutor;
 
-        autor = escogerAutor("SELECT * FROM autores");
-        idAutor = autor.getIdFromDB();
-        System.out.println("Nuevos datos del autor:");
-        nuevosDatos = crearAutor();
-        nuevosDatos.setIdAutor(idAutor);
-        sql = nuevosDatos.getUpdateString();
-        DBHandler.executeUpdate(sql);
+        if (DBHandler.hayRegistros("SELECT * FROM AUTORES")) {
+            autor = escogerAutor("SELECT * FROM autores");
+            idAutor = autor.getIdFromDB();
+            System.out.println("Nuevos datos del autor:");
+            nuevosDatos = crearAutor();
+            nuevosDatos.setIdAutor(idAutor);
+            sql = nuevosDatos.getUpdateString();
+            DBHandler.executeUpdate(sql);
+        } else {
+            System.out.println("No hay autores registrados");
+        }
     }
     public static void eliminar(int option) {
         switch (option) {
@@ -138,24 +150,60 @@ public class Catalogo {
             }
         }
     }
-
     private static void eliminarEjemplar(){
+        Ejemplar ejemplar;
+        if (DBHandler.hayRegistros("SELECT * FROM ejemplares")) {
+            ejemplar = escogerEjemplar();
+            if (DBHandler.hayRegistros(ejemplar.getSelectString())) {
+                DBHandler.executeUpdate(ejemplar.getDeleteString());
+            } else {
+                System.out.println("No se encontro el ejemplar");
+            }
+        } else {
+            System.out.println("No hay ejempalres registrados");
+        }
     }
     private static void eliminarLibro(){
-
+        Libro libro;
+        if (DBHandler.hayRegistros("SELECT * FROM catalogo")) {
+            libro = escogerLibro("SELECT * FROM catalogo");
+            if (DBHandler.hayRegistros(libro.getSelectString())) {
+                libro.setIdLibro(libro.setIdFromDB());
+                if (!DBHandler.hayRegistros("SELECT * FROM ejemplares WHERE idLibro = " + libro.getIdLibro() + ";")) {
+                    DBHandler.executeUpdate(libro.getDeleteString());
+                } else {
+                    System.out.println("No puede eliminar el libro mientras haya ejemplares vinculados.");
+                }
+            } else {
+                System.out.println("No se ha encontrado el libro");
+            }
+        } else {
+            System.out.println("No hay libros registrados");
+        }
     }
     private static void eliminarAutor(){
-
+        Autor autor;
+        if (DBHandler.hayRegistros("SELECT * FROM autores")) {
+            autor = escogerAutor("SELECT * FROM autores");
+            if (DBHandler.hayRegistros(autor.getSelectString())) {
+                autor.setIdAutor(autor.setIdFromDB());
+                if (!DBHandler.hayRegistros("SELECT * FROM catalogo WHERE idAutor = " + autor.getIdAutor() + ";")) {
+                    DBHandler.executeUpdate(autor.getDeleteString());
+                } else {
+                    System.out.println("No puede eliminar el autor mientras haya libros vinculados.");
+                }
+            } else {
+                System.out.println("No se ha encontrado el autor");
+            }
+        } else {
+            System.out.println("No hay autores registrados");
+        }
     }
-    private static Ejemplar escogerEjemplar(String sql) {
-        ArrayList<Ejemplar> ejemplares;
+    private static Ejemplar escogerEjemplar() {
         Ejemplar ejemplar;
-
-        ejemplares = DBHandler.getEjemplares(sql);
-        System.out.println("Escoja el libro que desea modificar");
-        mostrarEjemplares(ejemplares);
-        ejemplar = ejemplares.get(pedirDatos.pedirInt(1, ejemplares.size()) - 1);
-
+        String codigoEjemplar;
+        codigoEjemplar = pedirDatos.pedirString("Introduzca el codigo del ejemplar");
+        ejemplar = new Ejemplar(codigoEjemplar);
         return ejemplar;
     }
     private static Libro escogerLibro(String sql) {
@@ -163,7 +211,7 @@ public class Catalogo {
         Libro libro;
 
         libros = DBHandler.getLibros(sql);
-        System.out.println("Escoja el libro que desea modificar");
+        System.out.println("Escoja un libro:");
         mostrarLibros(libros);
         libro = libros.get(pedirDatos.pedirInt(1, libros.size()) - 1);
 
@@ -174,22 +222,11 @@ public class Catalogo {
         Autor autor;
 
         autores = DBHandler.getAutores(sql);
-        System.out.println("Escoja el autor que desea modificar");
+        System.out.println("Escoja un autor:");
         mostrarAutores(autores);
         autor = autores.get(pedirDatos.pedirInt(1, autores.size()) - 1);
 
         return autor;
-    }
-    private static void mostrarEjemplares(ArrayList<Ejemplar> ejemplares){
-        Ejemplar ejemplar;
-        String mensaje;
-        Collections.sort(ejemplares);
-
-        for (int i = 0; i < ejemplares.size(); i++) {
-            ejemplar = ejemplares.get(i);
-            mensaje = " - " + (i + 1) + ". " + ejemplar.toString();
-            System.out.println(mensaje);
-        }
     }
     private static void mostrarLibros(ArrayList<Libro> libros) {
         Libro libro;
@@ -257,7 +294,6 @@ public class Catalogo {
         }
         return autor;
     }
-
     private static int getNumEjemplaresEditorial(String editorial) {
         int numeroEjemplares = 0;
         String sql =

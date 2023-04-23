@@ -1,6 +1,8 @@
 package User;
 
 import Gestion.Catalogo;
+import Gestion.Lectores;
+
 public class Menus {
     public static void mainMenu() {
         int option;
@@ -53,7 +55,7 @@ public class Menus {
                     break;
                 }
                 case 4: {
-                    System.out.println("Sin implementar");
+                    menuEliminar();
                 }
                 case 5: {
                     salir = true;
@@ -125,6 +127,33 @@ public class Menus {
             }
         } while (!salir);
     }
+
+    private static void menuEliminar() {
+        int option;
+        boolean salir = false;
+        do {
+            option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"+ " \n 1 - Eliminar ejemplar;"
+                    + "\n 2 - Eliminar libro;" + "\n 3 - Eliminar autor;"  + "\n 4 - Salir;");
+            switch (option) {
+                case 1: {
+                    Catalogo.eliminar(1);
+                    break;
+                }
+                case 2: {
+                    Catalogo.eliminar(2);
+                    break;
+                }
+                case 3: {
+                    Catalogo.eliminar(3);
+                    break;
+                }
+                case 4: {
+                    salir = true;
+                    break;
+                }
+            }
+        } while (!salir);
+    }
     private static void menuLectores() {
         int option;
         boolean salir = false;
@@ -135,7 +164,7 @@ public class Menus {
                     + "\n 3 - Modificar datos de lector" + "\n 4 - Dar de baja lector" + "\n 5 - Salir;");
             switch (option) {
                 case 1: {
-                    System.out.println("Sin implementar");
+                    menuBusquedaLectores();
                     break;
                 }
                 case 2: {
@@ -150,6 +179,48 @@ public class Menus {
                     System.out.println("Sin implementar");
                 }
                 case 5: {
+                    salir = true;
+                    break;
+                }
+            }
+        } while (!salir);
+    }
+
+    private static void menuBusquedaLectores() {
+        int option;
+        boolean salir = false;
+
+        do {
+            option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
+                    + " \n 1 - Todos los lectores;" + "\n 2 - Formular busqueda;" + "\n 3 - Salir;");
+            switch (option) {
+                case 1: {
+                    Lectores.consultarLectores(1);
+                    break;
+                }
+                case 2: {
+                    do {
+                        option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
+                                + " \n 1 - Buscar por datos personales;" + "\n 2 - Introducir numero de lector;" + "\n 3 - Salir;");
+                        switch (option) {
+                            case 1: {
+                                Lectores.consultarLectores(2);
+                                break;
+                            }
+                            case 2: {
+                                Lectores.consultarLectores(3);
+                                break;
+                            }
+                            case 3: {
+                                salir = true;
+                                break;
+                            }
+                        }
+                    } while (!salir);
+                    salir = false;
+                    break;
+                }
+                case 3: {
                     salir = true;
                     break;
                 }

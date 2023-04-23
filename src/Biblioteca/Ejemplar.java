@@ -5,13 +5,16 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
     private int idEjemplar;
     private String codigoEjemplar;
     private Libro libro;
+
+    public Ejemplar (String codigoEjemplar) {
+        this.codigoEjemplar = codigoEjemplar;
+    }
     public Ejemplar(Libro libro) {
         super();
         this.codigoEjemplar = generarCodigoEjemplar();
         this.libro = libro;
         this.idEjemplar = getIdFromDB();
     }
-
     public Ejemplar(String codigoEjemplar, Libro libro) {
         super();
         this.codigoEjemplar = codigoEjemplar;
@@ -51,8 +54,7 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
         return "INSERT INTO ejemplares (codigo_ejemplar, idLibro) VALUES ('" + codigoEjemplar + "', '" + libro.getIdLibro() + "');";
     }
     public String getSelectString() {
-        return "SELECT * FROM ejemplares WHERE idLibro = '" + libro.getIdLibro()
-                + "' AND codigo_ejemplar = '" + codigoEjemplar + "';";
+        return "SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + codigoEjemplar + "';";
     }
     @Override
     public String getUpdateString() {
@@ -60,7 +62,7 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
     }
     @Override
     public String getDeleteString() {
-        return "DELETE FROM ejemplares WHERE codigoEjemplar = " + codigoEjemplar;
+        return "DELETE FROM ejemplares WHERE codigo_ejemplar = '" + codigoEjemplar + "';";
     }
     @Override
     public boolean isRegistrado() {

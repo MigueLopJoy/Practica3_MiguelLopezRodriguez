@@ -68,7 +68,7 @@ public class Libro implements Comparable<Libro>, ElementoBiblioteca {
                 + ", editorial = '" + editorial + "' WHERE idLibro = " + idLibro;
     }
     public String getDeleteString() {
-        return "DELETE FROM ejemplares WHERE idLibro = " + idLibro;
+        return "DELETE FROM catalogo WHERE idLibro = " + idLibro;
     }
     public boolean isRegistrado() {
         return DBHandler.hayRegistros(getSelectString());
@@ -88,6 +88,17 @@ public class Libro implements Comparable<Libro>, ElementoBiblioteca {
     }
     @Override
     public int compareTo(Libro libro) {
-        return libro.getTitulo().compareTo(this.titulo);
-    }
-}
+        int resultadoComparacion;
+
+        resultadoComparacion = titulo.toLowerCase().compareTo(libro.getTitulo().toLowerCase());
+        if (resultadoComparacion == 0) {
+            resultadoComparacion = autor.getNombre().compareTo(libro.getAutor().getNombre());
+            if (resultadoComparacion == 0) {
+                resultadoComparacion = autor.getApellido1().compareTo(libro.getAutor().getApellido1());
+                if (resultadoComparacion == 0) {
+                    resultadoComparacion = autor.getApellido2().compareTo(libro.getAutor().getApellido2());
+                }
+            }
+        }
+        return resultadoComparacion;
+    }}

@@ -8,10 +8,12 @@ public class Utils {
     }
 
     public static boolean validarNombre(String nombre) {
-        boolean nombreValido = true;
+        boolean nombreValido = false;
 
-        if (!nombre.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ&]+((\\s[a-zA-ZáéíóúÁÉÍÓÚñÑ&]+)+)?$")) {
-            nombreValido = false;
+        if (nombre.matches("^[A-ZÁÉÍÓÚÑ][a-záéíóúñ&]+(\\s[A-ZÁÉÍÓÚÑ][a-záéíóúñ&]+)*$")) {
+            nombreValido = true;
+        } else {
+            System.out.println("Nombre no valido");
         }
         return nombreValido;
     }
@@ -38,7 +40,6 @@ public class Utils {
         } else if (sql.indexOf("lectores") != -1) {
             elementoInsertado = "lector";
         }
-
         mensaje = elementoInsertado + " " + operacion + " con exito";
         return mensaje;
     }
