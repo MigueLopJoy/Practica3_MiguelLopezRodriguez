@@ -7,7 +7,6 @@ import java.sql.*;
 import java.time.Year;
 import java.util.ArrayList;
 public class DBHandler {
-
     public static ArrayList<Lector> getLectores(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -22,7 +21,6 @@ public class DBHandler {
         String numeroLector;
         String telefono;
         String email;
-        Direccion direccion;
         int idDireccion;
 
         try {
@@ -37,7 +35,7 @@ public class DBHandler {
                 email = resultset.getString("email");
                 idDireccion = resultset.getInt("idDireccion");
                 direccion = getDirecciones("SELECT * FROM direcciones WHERE idDireccion = " + idDireccion + ";").get(0);
-                lector = new Lector(nombre, apellido1, apellido2, numeroLector, telefono, email, idDireccion);
+                lector = new Lector(nombre, apellido1, apellido2, numeroLector, telefono, email, direccion);
                 lectores.add(lector);
             }
         } catch (SQLException e) {
@@ -59,30 +57,38 @@ public class DBHandler {
         ArrayList<Direccion> direcciones = new ArrayList<Direccion>();
         Statement statement = null;
         ResultSet resultset = null;
-        Direccion direccion;
-        String nombre;
-        String apellido1;
-        String apellido2;
-        String numeroLector;
-        String telefono;
-        String email;
-        int idDireccion;
+        Direccion direccion = null;
+        String tipoVia;
+        String nombreVia;
+        int numero;
+        int piso = 0;
+        char portal = ' ';
+        int codigoPostal;
+        String localidad;
+        String provincia;
 
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
             while (resultset.next()){
-                nombre = resultset.getString("nombre");
-                apellido1 = resultset.getString("apellido1");
-                apellido2 = resultset.getString("apellido2");
-                numeroLector = resultset.getString("numero_lector");
-                telefono = resultset.getString("telefono");
-                idDireccion = resultset.getInt("idDireccion");
-                direccion = getDirecciones("SELECT * FROM direcciones WHERE idDireccion = " + idDireccion + ";");
-                telefono = resultset.getString("telefono");
-                libro = getLibros("SELECT * FROM libros WHERE idLibro = " + idLibro + ";").get(0);
-                ejemplar = new Ejemplar(codigoEjemplar, libro);
-                ejemplares.add(ejemplar);
+                tipoVia = resultset.getString("tipo_via");
+                nombreVia = resultset.getString("nombre_via");
+                numero = resultset.getInt("numero");
+                codigoPostal = resultset.getInt("codigo_postal");
+                localidad = resultset.getString("localidad");
+                provincia = resultset.getString("provincia");
+                piso = resultset.getInt("piso");
+                if (!resultset.wasNull()) {
+                    portal = resultset.getString("portal").charAt(0);
+                    if (!resultset.wasNull()) {
+                        direccion = new Direccion(tipoVia, nombreVia, numero, piso, portal, codigoPostal, localidad, provincia);
+                    } else {
+                        direccion = new Direccion(tipoVia, nombreVia, numero, piso, codigoPostal, localidad, provincia);
+                    }
+                } else {
+                    direccion = new Direccion(tipoVia, nombreVia, numero, codigoPostal, localidad, provincia);
+                }
+                direcciones.add(direccion);
             }
         } catch (SQLException e) {
             e.printStackTrace();

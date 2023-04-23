@@ -1,249 +1,236 @@
 package Gestion;
 
+import Biblioteca.Autor;
+import Biblioteca.Direccion;
 import Biblioteca.Lector;
+import Biblioteca.Libro;
 import DBManagement.DBHandler;
-import java.util.ArrayList;ç
+import User.pedirDatos;
+
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.Collections;ç
+
 public class Lectores {
-        public static void consultarLectores(int option) {
-            if (DBHandler.hayRegistros("SELECT * FROM catalogo")) {
-                ArrayList<Lector> libros = buscar(option);
-                System.out.println("Libros encontrados: " + libros.size());
-                mostrarLibros(libros);
-            } else {
-                System.out.println("No hay registros disponibles");
-            }
+    public static void consultarLectores(int option) {
+        if (DBHandler.hayRegistros("SELECT * FROM catalogo")) {
+            ArrayList<Lector> lectores = buscar(option);
+            System.out.println("Lectores encontrados: " + lectores.size());
+            mostrarLectores(lectores);
+        } else {
+            System.out.println("No hay lectores registrados");
         }
-        private static ArrayList<Lector> buscar(int option) {
-            ArrayList<Lector> libros = new ArrayList<Lector>();
-            Lector autor;
-            String sql;
-            String tituloLibro;
+    }
 
-            switch (option) {
-                case 1: {
-                    libros = DBHandler.getLectores("SELECT * FROM catalogo");
-                    break;
-                }
-                case 2: {
-                    tituloLibro = pedirDatos.pedirString("Introduzca el numero de lector");
-                    sql = "SELECT * FROM catalogo WHERE titulo = '" + tituloLibro + "';";
-                    libros = DBHandler.getLibros(sql);
-                    break;
-                }
-                case 3: {
-                    autor = crearAutor();
-                    sql = "SELECT * FROM catalogo c INNER JOIN autores a ON c.idAutor = a.idAutor WHERE nombre = '"
-                            + autor.getNombre() + "' AND apellido1 = '" + autor.getApellido1() + "' AND apellido2 = '"
-                            + autor.getApellido2() + "';";
-                    libros = DBHandler.getLibros(sql);
-                    break;
-                }
-            }
-            return libros;
-        }
-        public static void registrarEjemplar() {
-            Ejemplar ejemplar;
-            Libro libro;
+    private static ArrayList<Lector> buscar(int option) {
+        ArrayList<Lector> lectores = new ArrayList<Lector>();
+        Lector lector;
+        String sql;
+        String numeroLector;
 
-            ejemplar = crearEjemplar();
-            libro = ejemplar.getLibro();
+        switch (option) {
+            case 1: {
+                libros = DBHandler.getLectores("SELECT * FROM lectores");
+                break;
+            }
+            case 2: {
+                lector = crearLector();
+                sql = "SELECT * FROM lectores c INNER JOIN autores a ON c.idAutor = a.idAutor WHERE nombre = '"
+                        + autor.getNombre() + "' AND apellido1 = '" + autor.getApellido1() + "' AND apellido2 = '"
+                        + autor.getApellido2() + "';";
+                lectores = DBHandler.getLibros(sql);
+                break;
+            }
+            case 3: {
+                numeroLector = pedirDatos.pedirString("Introduzca el numero de lector");
+                sql = "SELECT * FROM catalogo WHERE titulo = '" + numeroLector + "';";
+                lectores = DBHandler.getLectores(sql);
+                break;
+            }
+        }
+        return libros;
+    }
 
-            if (!libro.isRegistrado()) {
-                registrarLibro(libro);
-            }
+    public static void registrarEjemplar() {
+        Lector lector;
+        Direccion direccion;
 
-            DBHandler.executeUpdate(ejemplar.getInsertString());
-        }
-        private static void registrarLibro(Libro libro) {
-            Autor autor = libro.getAutor();
+        lector = crearLector();
+        direccion = lector.getDireccion();
 
-            if (!libro.isRegistrado()) {
-                if (!autor.isRegistrado()) {
-                    registrarAutor(autor);
-                }
-                // Registrar libro
-                DBHandler.executeUpdate(libro.getInsertString());
-                // Almacenar el id del libro asignado en la BBDD
-                libro.setIdLibro(libro.setIdFromDB());
+        if (!direccion.isRegistrado()) {
+            registrarDireccion(direccion);
+        }
+        DBHandler.executeUpdate(lector.getInsertString());
+    }
+    private static void registrarDireccion(Direccion direccion) {
+        if (!direccion.isRegistrado()) {
+            // Registrar autor
+            DBHandler.executeUpdate(direccion.getInsertString());
+            // Almacenar el id del autor asignado en la BBDD
+            direccion.setIdDireccion(direccion.setIdFromDB());
+        }
+    }
+    public static void actualizar(int option) {
+        switch (option) {
+            case 1: {
+                actualizarLibro();
+                break;
+            }
+            case 2: {
+                actualizarDireccion();
+                break;
             }
         }
-        private static void registrarAutor(Autor autor) {
-            if (!autor.isRegistrado()) {
-                // Registrar autor
-                DBHandler.executeUpdate(autor.getInsertString());
-                // Almacenar el id del autor asignado en la BBDD
-                autor.setIdAutor(autor.setIdFromDB());
-            }
-        }
-        public static void actualizar(int option) {
-            switch (option) {
-                case 1: {
-                    actualizarLibro();
-                    break;
-                }
-                case 2: {
-                    actualizarAutor();
-                    break;
-                }
-            }
-        }
-        private static void actualizarLibro() {
-            Libro libro;
-            Libro nuevosDatos;
-            String sql;
-            int idLibro;
+    }
 
-            if (DBHandler.hayRegistros("SELECT * FROM catalogo")) {
-                libro = escogerLibro("SELECT * FROM catalogo");
-                idLibro = libro.getIdFromDB();
-                System.out.println("Nuevos datos del libro:");
-                nuevosDatos = crearLibro();
-                nuevosDatos.setIdLibro(idLibro);
-                if (!nuevosDatos.getAutor().isRegistrado()) {
-                    nuevosDatos.getAutor().setIdAutor(libro.getAutor().getIdAutor());
-                    DBHandler.executeUpdate(nuevosDatos.getAutor().getUpdateString());
-                }
-                sql = nuevosDatos.getUpdateString();
-                DBHandler.executeUpdate(sql);
-            } else {
-                System.out.println("No hay libros registrados");
-            }
-        }
-        private static void actualizarAutor() {
-            Autor autor;
-            Autor nuevosDatos;
-            String sql;
-            int idAutor;
+    private static void actualizarLibro() {
+        Lector lector;
+        Lector nuevosDatos;
+        String sql;
+        int idLector;
 
-            if (DBHandler.hayRegistros("SELECT * FROM AUTORES")) {
-                autor = escogerAutor("SELECT * FROM autores");
-                idAutor = autor.getIdFromDB();
-                System.out.println("Nuevos datos del autor:");
-                nuevosDatos = crearAutor();
-                nuevosDatos.setIdAutor(idAutor);
-                sql = nuevosDatos.getUpdateString();
-                DBHandler.executeUpdate(sql);
-            } else {
-                System.out.println("No hay autores registrados");
+        if (DBHandler.hayRegistros("SELECT * FROM lectores")) {
+            lector = escogerLector("SELECT * FROM catalogo");
+            idLector = lector.getIdFromDB();
+            System.out.println("Nuevos datos del libro:");
+            nuevosDatos = crearLector();
+            nuevosDatos.setIdLector(idLector);
+            if (!nuevosDatos.getDireccion().isRegistrado()) {
+                nuevosDatos.getDireccion().setIdDireccion(lector.getDireccion().getIdDireccion());
+                DBHandler.executeUpdate(nuevosDatos.getDireccion().getUpdateString());
             }
+            sql = nuevosDatos.getUpdateString();
+            DBHandler.executeUpdate(sql);
+        } else {
+            System.out.println("No hay libros registrados");
         }
-        public static void eliminar(int option) {
-            switch (option) {
-                case 1: {
-                    eliminarEjemplar();
-                    break;
-                }
-                case 2: {
-                    eliminarLibro();
-                    break;
-                }
-                case 3: {
-                    eliminarAutor();
-                    break;
-                }
-            }
+    }
+
+    private static void actualizarDireccion() {
+        Lector lector;
+        Direccion direccion;
+        Direccion nuevosDatos;
+        String sql;
+        int idDireccion;
+
+        if (DBHandler.hayRegistros("SELECT * FROM direcciones")) {
+            lector = buscar();
+            idDireccion = lector.getIdFromDB();
+            System.out.println("Nueva direccion:");
+            nuevosDatos = crearDireccion();
+            nuevosDatos.setIdDireccion(idDireccion);
+            sql = nuevosDatos.getUpdateString();
+            DBHandler.executeUpdate(sql);
+        } else {
+            System.out.println("No hay direcciones registradas");
         }
-        private static void eliminarEjemplar(){
-            Ejemplar ejemplar;
-            if (DBHandler.hayRegistros("SELECT * FROM ejemplares")) {
-                ejemplar = escogerEjemplar();
-                if (DBHandler.hayRegistros(ejemplar.getSelectString())) {
-                    DBHandler.executeUpdate(ejemplar.getDeleteString());
+    }
+    public static void eliminarLector() {
+        Lector lector;
+        if (DBHandler.hayRegistros("SELECT * FROM lectores")) {
+            lector = escogerLector("SELECT * FROM lectores");
+            if (DBHandler.hayRegistros(lector.getSelectString())) {
+                lector.setIdLector(lector.setIdFromDB());
+                if (!DBHandler.hayRegistros("SELECT * FROM direcciones WHERE idLector = " + lector.getIdLector() + ";")) {
+                    DBHandler.executeUpdate(lector.getDeleteString());
+                    eliminarDireccion(lector.getDireccion());
                 } else {
-                    System.out.println("No se encontro el ejemplar");
+                    System.out.println("No puede eliminar el lector mientras haya direcciones vinculadas.");
                 }
             } else {
-                System.out.println("No hay ejempalres registrados");
+                System.out.println("No se ha encontrado al lector");
             }
+        } else {
+            System.out.println("No hay lectores registrados");
         }
-        private static void eliminarLibro(){
-            Libro libro;
-            if (DBHandler.hayRegistros("SELECT * FROM catalogo")) {
-                libro = escogerLibro("SELECT * FROM catalogo");
-                if (DBHandler.hayRegistros(libro.getSelectString())) {
-                    libro.setIdLibro(libro.setIdFromDB());
-                    if (!DBHandler.hayRegistros("SELECT * FROM ejemplares WHERE idLibro = " + libro.getIdLibro() + ";")) {
-                        DBHandler.executeUpdate(libro.getDeleteString());
-                    } else {
-                        System.out.println("No puede eliminar el libro mientras haya ejemplares vinculados.");
-                    }
-                } else {
-                    System.out.println("No se ha encontrado el libro");
+    }
+    private static void eliminarDireccion(Direccion direccion) {
+        if (DBHandler.hayRegistros("SELECT * FROM direcciones")) {
+            if (DBHandler.hayRegistros(direccion.getSelectString())) {
+                if (!DBHandler.hayRegistros("SELECT * FROM lectores WHERE idDireccion = " + direccion.getIdDireccion() + ";")) {
+                    DBHandler.executeUpdate(direccion.getDeleteString());
                 }
+            }
+        }
+    }
+    private static Lector escogerLector(String sql) {
+        ArrayList<Lector> lectores;
+        Lector lector;
+
+        lectores = DBHandler.getLectores(sql);
+        System.out.println("Escoja un lector:");
+        mostrarLectores(lectores);
+        lector = lectores.get(pedirDatos.pedirInt(1, lectores.size()) - 1);
+
+        return lector;
+    }
+    private static void mostrarLectores(ArrayList<Lector> lectores) {
+        Lector lector;
+        String mensaje;
+        Collections.sort(lectores);
+
+        for (int i = 0; i < lectores.size(); i++) {
+            lector = lectores.get(i);
+            mensaje = " - " + (i + 1) + ". " + lector.toString();
+            System.out.println(mensaje);
+        }
+    }
+    private static Lector crearLector() {
+        Lector lector;
+        String nombre;
+        String apellido1;
+        String apellido2 = "";
+        String telefono;
+        String email;
+        Direccion direccion;
+
+        nombre = pedirDatos.pedirString(" - Intorduzca el titulo del libro");
+        apellido1 = pedirDatos.pedirString(" - Intorduzca el primer apellido");
+        if (pedirDatos.confirmacion("El lector tiene un segundo apellido? (s/n)")) {
+            apellido2 = pedirDatos.pedirString(" - Intorduzca el titulo del libro");
+        }
+        telefono = pedirDatos.pedirString("Introduzca el numero de telefono");
+        if (pedirDatos.confirmacion("El lector tiene email? (s/n)")) {
+            email = pedirDatos.pedirString("Introduzca el email");
+        }
+        direccion = crearDireccion();
+
+        return lector;
+    }
+    private static Direccion crearDireccion() {
+        Direccion direccion;
+        String tipoVia;
+        String nombreVia;
+        int numero;
+        int piso = 0;
+        char portal = '\u0000';
+        int codigoPostal;
+        String localidad;
+        String provincia;
+
+        tipoVia = pedirDatos.pedirNombre(" - Introduzca el tipo de via");
+        nombreVia = pedirDatos.pedirNombre(" - Introduzca el nombre de la via");
+        numero = pedirDatos.pedirInt("Introduzca el numero", 1, 500);
+        if (pedirDatos.confirmacion("La vivienda tiene varias plantas? (s/n)")) {
+            piso = pedirDatos.pedirInt("Introduzca la planta", 1, 30);
+            if (pedirDatos.confirmacion("La planta tiene varios portales? (s/n)")) {
+                portal = pedirDatos.pedirString("Introduzca el portal").charAt(0);
+            }
+        }
+        codigoPostal = pedirDatos.pedirInt("Introduzca el codigo postañ", 11111, 99999);
+        localidad = pedirDatos.pedirNombre("Introduzca el nombre de la localidad");
+        provincia = pedirDatos.pedirNombre("Introduzca el nombre de la provincia");
+
+        if (piso != 0) {
+            if (portal != '\u0000') {
+                direccion = new Direccion(tipoVia, nombreVia, numero, piso, portal, codigoPostal, localidad, provincia);
             } else {
-                System.out.println("No hay libros registrados");
+                direccion = new Direccion(tipoVia, nombreVia, numero, piso, codigoPostal, localidad, provincia);
             }
+        } else{
+            direccion = new Direccion(tipoVia, nombreVia, numero, codigoPostal, localidad, provincia);
         }
-        private static void eliminarAutor(){
-            Autor autor;
-            if (DBHandler.hayRegistros("SELECT * FROM autores")) {
-                autor = escogerAutor("SELECT * FROM autores");
-                if (DBHandler.hayRegistros(autor.getSelectString())) {
-                    autor.setIdAutor(autor.setIdFromDB());
-                    if (!DBHandler.hayRegistros("SELECT * FROM catalogo WHERE idAutor = " + autor.getIdAutor() + ";")) {
-                        DBHandler.executeUpdate(autor.getDeleteString());
-                    } else {
-                        System.out.println("No puede eliminar el autor mientras haya libros vinculados.");
-                    }
-                } else {
-                    System.out.println("No se ha encontrado el autor");
-                }
-            } else {
-                System.out.println("No hay autores registrados");
-            }
-        }
-        private static Ejemplar escogerEjemplar() {
-            Ejemplar ejemplar;
-            String codigoEjemplar;
-            codigoEjemplar = pedirDatos.pedirString("Introduzca el codigo del ejemplar");
-            ejemplar = new Ejemplar(codigoEjemplar);
-            return ejemplar;
-        }
-        private static Libro escogerLibro(String sql) {
-            ArrayList<Libro> libros;
-            Libro libro;
-
-            libros = DBHandler.getLibros(sql);
-            System.out.println("Escoja un libro:");
-            mostrarLibros(libros);
-            libro = libros.get(pedirDatos.pedirInt(1, libros.size()) - 1);
-
-            return  libro;
-        }
-        private static Autor escogerAutor(String sql) {
-            ArrayList<Autor> autores;
-            Autor autor;
-
-            autores = DBHandler.getAutores(sql);
-            System.out.println("Escoja un autor:");
-            mostrarAutores(autores);
-            autor = autores.get(pedirDatos.pedirInt(1, autores.size()) - 1);
-
-            return autor;
-        }
-        private static void mostrarLibros(ArrayList<Libro> libros) {
-            Libro libro;
-            String mensaje;
-            // Ordenar alfabeticamente por titulos los libros obtendios en la busqueda
-            Collections.sort(libros);
-
-            for (int i = 0; i < libros.size(); i++) {
-                libro = libros.get(i);
-                mensaje = " - " + (i + 1) + ". " + libro.toString()
-                        + " (Ejemplares: " + getNumEjemplaresEditorial(libro.getEditorial()) + ")";;
-                System.out.println(mensaje);
-            }
-        }
-        private static void mostrarAutores(ArrayList<Autor> autores) {
-            Autor autor;
-            String mensaje;
-            // Ordenar alfabeticamente por titulos los libros obtendios en la busqueda
-            Collections.sort(autores);
-
-            for (int i = 0; i < autores.size(); i++) {
-                autor = autores.get(i);
-                mensaje = " - " + (i + 1) + ". " + autor.toString();
-                System.out.println(mensaje);
-            }
-        }
+        return direccion;
+    }
 }

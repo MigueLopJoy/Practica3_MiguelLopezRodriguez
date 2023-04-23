@@ -176,7 +176,7 @@ public class Menus {
                     break;
                 }
                 case 4: {
-                    System.out.println("Sin implementar");
+                    Lectores.eliminarLector();
                 }
                 case 5: {
                     salir = true;

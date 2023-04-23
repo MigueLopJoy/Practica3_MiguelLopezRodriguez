@@ -1,7 +1,7 @@
 package Biblioteca;
 
 import DBManagement.DBHandler;
-public class Autor extends Persona implements Comparable<Autor>, ElementoBiblioteca {
+public class Autor extends Persona  {
     private int idAutor;
     public Autor() {
         super();
@@ -21,16 +21,37 @@ public class Autor extends Persona implements Comparable<Autor>, ElementoBibliot
         this.idAutor = idAutor;
     }
     public String getInsertString() {
-        return  "INSERT INTO autores (nombre, apellido1, apellido2) VALUES ('"
+        String inserString;
+        if (getApellido2() != null) {
+            inserString = "INSERT INTO autores (nombre, apellido1, apellido2) VALUES ('"
                     + getNombre() + "', '" + getApellido1() + "', '" + getApellido2() + "');";
+        } else {
+            inserString = "INSERT INTO autores (nombre, apellido1) VALUES ('"
+                    + getNombre() + "', '" + getApellido1() + "');";
+        }
+        return  inserString;
     }
     public String getSelectString() {
-        return "SELECT * FROM autores WHERE nombre = '" + getNombre()
+        String selectString;
+        if (getApellido2() != null) {
+            selectString = "SELECT * FROM autores WHERE nombre = '" + getNombre()
                     + "' AND apellido1 = '" + getApellido1() + "' AND apellido2 = '" + getApellido2() + "';";
+        } else {
+            selectString = "SELECT * FROM autores WHERE nombre = '" + getNombre()
+                    + "' AND apellido1 = '" + getApellido1() + "';";
+        }
+        return  selectString;
     }
     public String getUpdateString() {
-        return "UPDATE autores SET nombre = '" + getNombre() + "', apellido1 = '" + getApellido1()
-                    + "', apellido2 = '" + getApellido2() + "' WHERE idAutor = " + idAutor;
+        String updateString;
+        if (getApellido2() != null) {
+            updateString = "UPDATE autores SET nombre = '" + getNombre() + "', apellido1 = '" + getApellido1()
+                    + "', apellido2 = '" + getApellido2() + "' WHERE idAutor = " + idAutor + ";";
+        } else {
+            updateString = "UPDATE autores SET nombre = '" + getNombre() + "', apellido1 = '"
+                    + getApellido1() + "' WHERE idAutor = " + idAutor + ";";
+        }
+        return updateString;
     }
     public String getDeleteString() {
         return "DELETE FROM autores WHERE idAutor = " + idAutor;
@@ -49,32 +70,5 @@ public class Autor extends Persona implements Comparable<Autor>, ElementoBibliot
             id = getIdFromDB();
         }
         return id;
-    }
-    public String toString() {
-        String toString;
-
-        if (getApellido2() != null) {
-            toString = getNombre() + " " + getApellido1() + " " + getApellido2();
-        } else {
-            toString = getNombre() + " " + getApellido1();
-        }
-        return toString;
-    }
-    @Override
-    public int compareTo(Autor autor) {
-        int resultadoComparacion;
-
-        resultadoComparacion = getNombre().compareTo(autor.getNombre());
-        if (resultadoComparacion == 0) {
-            resultadoComparacion = getApellido1().compareTo(autor.getApellido2());
-            if (resultadoComparacion == 0) {
-                if (getApellido2() != null) {
-                    resultadoComparacion = getApellido2().compareTo(autor.getApellido2());
-                } else {
-                    resultadoComparacion = -1;
-                }
-            }
-        }
-        return resultadoComparacion;
     }
 }

@@ -7,22 +7,22 @@ public class Lector extends Persona implements ElementoBiblioteca {
     private String numeroLector;
     private String telefono;
     private String email;
-    private int idDireccion;
+    private Direccion direccion;
 
-    public Lector(String nombre, String apellido1, String apellido2, String numeroLector, String telefono, String email, int idDireccion) {
+    public Lector(String nombre, String apellido1, String apellido2, String numeroLector, String telefono, String email, Direccion direccion) {
         super(nombre, apellido1, apellido2);
-        this.numeroLector = numeroLector;
+        this.numeroLector = generarNumeroLector();
         this.telefono = telefono;
         this.email = email;
-        this.idDireccion = idDireccion;
+        this.direccion = direccion;
     }
-    public Lector(int idLector, String nombre, String apellido1, String apellido2, String numeroLector, String telefono, String email, int idDireccion) {
+    public Lector(int idLector, String nombre, String apellido1, String apellido2, String numeroLector, String telefono, String email, Direccion direccion) {
         super(nombre, apellido1, apellido2);
         this.idLector = idLector;
-        this.numeroLector = numeroLector;
+        this.numeroLector = generarNumeroLector();
         this.telefono = telefono;
         this.email = email;
-        this.idDireccion = idDireccion;
+        this.direccion = direccion;
     }
     public int getIdLector() {
         return idLector;
@@ -48,27 +48,32 @@ public class Lector extends Persona implements ElementoBiblioteca {
     public void setEmail(String email) {
         this.email = email;
     }
-    public int getIdDireccion() {
-        return idDireccion;
+    public Direccion getDireccion() {
+        return direccion;
     }
-    public void setIdDireccion(int idDireccion) {
-        this.idDireccion = idDireccion;
+    public void setDireccion(Direccion direccion) {
+        this.direccion = direccion;
     }
+    @Override
     public String getInsertString() {
         return "INSERT INTO lectores (nombre, apellido1, apellido2, numeroLector, telefono, email, idDireccion) " +
                 "VALUES ('" + getNombre() + "', '" + getApellido1() + "', '" + getApellido2() + "', '" + numeroLector
-                + "', '" + telefono + "', '" + email + "', '" + idDireccion + "');";
+                + "', '" + telefono + "', '" + email + "', '" + direccion.getIdDireccion() + "');";
     }
     @Override
     public String getSelectString() {
-        return null;
+        return "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellido1 = '" + getApellido1()
+                + "' AND apellido2 = '" + getApellido2() + "' AND numeroLector = '" + numeroLector + "' AND telefono = '" + telefono
+                + "' AND email = '" + email + "' AND idDireccion = '" + direccion.getIdDireccion() + "';";
     }
     @Override
     public String getUpdateString() {
-        return null;
+        return "UPDATE lectores SET nombre = '" + getNombre() + "', apellido1 = '" + getApellido1() + "', apellido2 = '" + getApellido2()
+                + "', numeroLector = '" + numeroLector + "', telefono = '" + telefono + "', email = '" + email
+                + "', idDireccion = '" + direccion.getIdDireccion() + "' WHERE idLector = " + idLector;
     }
     public String getDeleteString() {
-        return "DELETE FROM ejemplares WHERE numeroLector = " + numeroLector;
+        return "DELETE FROM lectores WHERE numeroLector = " + numeroLector;
     }
     @Override
     public boolean isRegistrado() {
@@ -87,5 +92,15 @@ public class Lector extends Persona implements ElementoBiblioteca {
             id = getIdFromDB();
         }
         return id;
+    }
+    private String generarNumeroLector() {
+        String codigoEjemplar = "";
+        char[] letras = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+
+        for (int i = 0; i < 8; i++) {
+            codigoEjemplar += (int)(Math.random()*10);
+        }
+        codigoEjemplar += letras[(int)(Math.random() * 26)];
+        return codigoEjemplar;
     }
 }

@@ -73,19 +73,6 @@ public class Libro implements Comparable<Libro>, ElementoBiblioteca {
     public boolean isRegistrado() {
         return DBHandler.hayRegistros(getSelectString());
     }
-    public int getIdFromDB() {
-        return DBHandler.getInt(getSelectString(), "idLibro");
-    }
-    public int setIdFromDB() {
-        int idLibro = 0;
-        if (isRegistrado()) {
-            idLibro = getIdFromDB();
-        }
-        return idLibro;
-    }
-    public String toString() {
-        return titulo + " / " + autor.toString() + " - " + editorial + ", " + añoPublicacion;
-    }
     @Override
     public int compareTo(Libro libro) {
         int resultadoComparacion;
