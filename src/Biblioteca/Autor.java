@@ -1,18 +1,27 @@
 package Biblioteca;
 
 import DBManagement.DBHandler;
-public class Autor extends Persona  {
+public class Autor extends Persona implements ElementoBiblioteca {
     private int idAutor;
     public Autor() {
         super();
     }
     public Autor(String nombre, String apellido1) {
         super(nombre, apellido1);
-        this.idAutor = setIdFromDB();
+        this.idAutor = getIdFromDB();
     }
     public Autor(String nombre, String apellido1, String apellido2) {
         super(nombre, apellido1, apellido2);
-        this.idAutor = setIdFromDB();
+        this.idAutor = getIdFromDB();
+    }
+
+    public Autor(int idAutor, String nombre, String apellido1) {
+        super(nombre, apellido1);
+        this.idAutor = idAutor;
+    }
+    public Autor(int idAutor, String nombre, String apellido1, String apellido2) {
+        super(nombre, apellido1, apellido2);
+        this.idAutor = idAutor;
     }
     public int getIdAutor() {
         return idAutor;
@@ -56,18 +65,16 @@ public class Autor extends Persona  {
     public String getDeleteString() {
         return "DELETE FROM autores WHERE idAutor = " + idAutor;
     }
+
+    @Override
     public boolean isRegistrado() {
         return DBHandler.hayRegistros(getSelectString());
     }
+    @Override
     public int getIdFromDB() {
-        int idAutor = 0;
-        idAutor = DBHandler.getInt(getSelectString(), 1);
-        return idAutor;
-    }
-    public int setIdFromDB() {
         int id = 0;
         if (isRegistrado()) {
-            id = getIdFromDB();
+            id = DBHandler.getInt(getSelectString(), 1);
         }
         return id;
     }

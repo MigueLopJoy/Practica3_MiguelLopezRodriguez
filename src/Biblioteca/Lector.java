@@ -1,7 +1,6 @@
 package Biblioteca;
 
 import DBManagement.DBHandler;
-
 public class Lector extends Persona implements ElementoBiblioteca {
     private int idLector;
     private String numeroLector;
@@ -9,17 +8,62 @@ public class Lector extends Persona implements ElementoBiblioteca {
     private String email;
     private Direccion direccion;
 
-    public Lector(String nombre, String apellido1, String apellido2, String numeroLector, String telefono, String email, Direccion direccion) {
+    public Lector(String nombre, String apellido1, String telefono, Direccion direccion) {
+        super(nombre, apellido1);
+        this.numeroLector = generarNumeroLector();
+        this.telefono = telefono;
+        this.direccion = direccion;
+        this.idLector = getIdFromDB();
+    }
+    public Lector(String nombre, String apellido1, String apellido2, String telefono, Direccion direccion, int tipo) {
+        super(nombre, apellido1, apellido2);
+        this.numeroLector = generarNumeroLector();
+        this.telefono = telefono;
+        this.direccion = direccion;
+        this.idLector = getIdFromDB();
+    }
+    public Lector(String nombre, String apellido1, String telefono, String email, Direccion direccion) {
+        super(nombre, apellido1);
+        this.numeroLector = generarNumeroLector();
+        this.telefono = telefono;
+        this.email = email;
+        this.direccion = direccion;
+        this.idLector = getIdFromDB();
+    }
+    public Lector(String nombre, String apellido1, String apellido2, String telefono, String email, Direccion direccion) {
         super(nombre, apellido1, apellido2);
         this.numeroLector = generarNumeroLector();
         this.telefono = telefono;
         this.email = email;
         this.direccion = direccion;
+        this.idLector = getIdFromDB();
+    }
+    public Lector(int idLector, String nombre, String apellido1, String numeroLector, String telefono, Direccion direccion) {
+        super(nombre, apellido1);
+        this.idLector = idLector;
+        this.numeroLector = numeroLector;
+        this.telefono = telefono;
+        this.direccion = direccion;
+    }
+    public Lector(int idLector, String nombre, String apellido1, String numeroLector, String telefono, String email, Direccion direccion) {
+        super(nombre, apellido1);
+        this.idLector = idLector;
+        this.numeroLector = numeroLector;
+        this.telefono = telefono;
+        this.email = email;
+        this.direccion = direccion;
+    }
+    public Lector(int idLector, String nombre, String apellido1, String apellido2, String numeroLector, String telefono, Direccion direccion, int tipo) {
+        super(nombre, apellido1, apellido2);
+        this.idLector = idLector;
+        this.numeroLector = numeroLector;
+        this.telefono = telefono;
+        this.direccion = direccion;
     }
     public Lector(int idLector, String nombre, String apellido1, String apellido2, String numeroLector, String telefono, String email, Direccion direccion) {
         super(nombre, apellido1, apellido2);
         this.idLector = idLector;
-        this.numeroLector = generarNumeroLector();
+        this.numeroLector = numeroLector;
         this.telefono = telefono;
         this.email = email;
         this.direccion = direccion;
@@ -56,21 +100,82 @@ public class Lector extends Persona implements ElementoBiblioteca {
     }
     @Override
     public String getInsertString() {
-        return "INSERT INTO lectores (nombre, apellido1, apellido2, numeroLector, telefono, email, idDireccion) " +
-                "VALUES ('" + getNombre() + "', '" + getApellido1() + "', '" + getApellido2() + "', '" + numeroLector
-                + "', '" + telefono + "', '" + email + "', '" + direccion.getIdDireccion() + "');";
+        String insertString;
+        if (getApellido2() != null) {
+            if (this.email != null) {
+                insertString = "INSERT INTO lectores (nombre, apellido1, apellido2, numeroLector, telefono, email, idDireccion) " +
+                        "VALUES ('" + getNombre() + "', '" + getApellido1() + "', '" + getApellido2() + "', '" + numeroLector
+                        + "', '" + telefono + "', '" + email + "', '" + direccion.getIdDireccion() + "');";
+            } else {
+                insertString = "INSERT INTO lectores (nombre, apellido1, apellido2, numeroLector, telefono, idDireccion) " +
+                        "VALUES ('" + getNombre() + "', '" + getApellido1() + "', '" + getApellido2() + "', '" + numeroLector
+                        + "', '" + telefono + "', '" + direccion.getIdDireccion() + "');";            }
+        } else {
+            if (email != null) {
+                insertString = "INSERT INTO lectores (nombre, apellido1, numeroLector, telefono, email, idDireccion) " +
+                        "VALUES ('" + getNombre() + "', '" + getApellido1() + "', '" + getApellido2() + "', '" + numeroLector
+                        + "', '" + telefono + "', '" + email + "', '" + direccion.getIdDireccion() + "');";
+            } else {
+                insertString = "INSERT INTO lectores (nombre, apellido1, numeroLector, telefono, idDireccion) " +
+                        "VALUES ('" + getNombre() + "', '" + getApellido1() + "', '" + numeroLector
+                        + "', '" + telefono + "', '" + "', '" + direccion.getIdDireccion() + "');";
+            }
+        }
+        return insertString;
     }
     @Override
     public String getSelectString() {
-        return "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellido1 = '" + getApellido1()
-                + "' AND apellido2 = '" + getApellido2() + "' AND numeroLector = '" + numeroLector + "' AND telefono = '" + telefono
-                + "' AND email = '" + email + "' AND idDireccion = '" + direccion.getIdDireccion() + "';";
+        String selectString;
+
+        if (getApellido2() != null) {
+            if (this.email != null) {
+                selectString = "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellido1 = '" + getApellido1()
+                        + "' AND apellido2 = '" + getApellido2() + "' AND numeroLector = '" + numeroLector + "' AND telefono = '" + telefono
+                        + "' AND email = '" + email + "' AND idDireccion = '" + direccion.getIdDireccion() + "';";
+            } else {
+                selectString = "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellido1 = '" + getApellido1()
+                        + "' AND apellido2 = '" + getApellido2() + "' AND numeroLector = '" + numeroLector + "' AND telefono = '" + telefono
+                       + "' AND idDireccion = '" + direccion.getIdDireccion() + "';";
+            }
+        } else {
+            if (email != null) {
+                selectString = "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellido1 = '" + getApellido1()
+                        + "' AND numeroLector = '" + numeroLector + "' AND telefono = '" + telefono + "' AND email = '" + email
+                        + "' AND idDireccion = '" + direccion.getIdDireccion() + "';";
+            } else {
+                selectString = "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellido1 = '" + getApellido1()
+                        + "' AND numeroLector = '" + numeroLector + "' AND telefono = '" + telefono + "' AND idDireccion = '"
+                        + direccion.getIdDireccion() + "';";
+            }
+        }
+        return selectString;
     }
     @Override
     public String getUpdateString() {
-        return "UPDATE lectores SET nombre = '" + getNombre() + "', apellido1 = '" + getApellido1() + "', apellido2 = '" + getApellido2()
-                + "', numeroLector = '" + numeroLector + "', telefono = '" + telefono + "', email = '" + email
-                + "', idDireccion = '" + direccion.getIdDireccion() + "' WHERE idLector = " + idLector;
+        String updateString;
+
+        if (getApellido2() != null) {
+            if (this.email != null) {
+                updateString = "UPDATE lectores SET nombre = '" + getNombre() + "', apellido1 = '" + getApellido1() + "', apellido2 = '" + getApellido2()
+                        + "', numeroLector = '" + numeroLector + "', telefono = '" + telefono + "', email = '" + email
+                        + "', idDireccion = '" + direccion.getIdDireccion() + "' WHERE idLector = " + idLector;
+            } else {
+                updateString = "UPDATE lectores SET nombre = '" + getNombre() + "', apellido1 = '" + getApellido1() + "', apellido2 = '" + getApellido2()
+                        + "', numeroLector = '" + numeroLector + "', telefono = '" + telefono + "', idDireccion = '"
+                        + direccion.getIdDireccion() + "' WHERE idLector = " + idLector;
+            }
+        } else {
+            if (email != null) {
+                updateString = "UPDATE lectores SET nombre = '" + getNombre() + "', apellido1 = '" + getApellido1()
+                        + "', numeroLector = '" + numeroLector + "', telefono = '" + telefono + "', email = '" + email
+                        + "', idDireccion = '" + direccion.getIdDireccion() + "' WHERE idLector = " + idLector;
+            } else {
+                updateString = "UPDATE lectores SET nombre = '" + getNombre() + "', apellido1 = '" + getApellido1()
+                        + "', numeroLector = '" + numeroLector + "', telefono = '" + telefono + "', idDireccion = '"
+                        + direccion.getIdDireccion() + "' WHERE idLector = " + idLector;
+            }
+        }
+        return updateString;
     }
     public String getDeleteString() {
         return "DELETE FROM lectores WHERE numeroLector = " + numeroLector;
@@ -81,17 +186,15 @@ public class Lector extends Persona implements ElementoBiblioteca {
     }
     @Override
     public int getIdFromDB() {
-        int idDireccion = 0;
-        idDireccion = DBHandler.getInt(getSelectString(), 1);
-        return idDireccion;
-    }
-    @Override
-    public int setIdFromDB() {
         int id = 0;
         if (isRegistrado()) {
-            id = getIdFromDB();
+            id = DBHandler.getInt(getSelectString(), 1);
         }
         return id;
+    }
+    @Override
+    public String toString() {
+        return super.toString() + " Numero de lector: " + this.numeroLector;
     }
     private String generarNumeroLector() {
         String codigoEjemplar = "";

@@ -12,24 +12,21 @@ public class Direccion implements ElementoBiblioteca {
     private int codigoPostal;
     private String localidad;
     private String provincia;
-
     public Direccion() {
         super();
     }
-
     public Direccion(String tipoVia, String nombreVia, int numero, int codigoPostal, String localidad, String provincia) {
         super();
-        this.idDireccion = idDireccion;
         this.tipoVia = tipoVia;
         this.nombreVia = nombreVia;
         this.numero = numero;
         this.codigoPostal = codigoPostal;
         this.localidad = localidad;
         this.provincia = provincia;
+        this.idDireccion = getIdFromDB();
     }
     public Direccion(String tipoVia, String nombreVia, int numero, int piso, int codigoPostal, String localidad, String provincia) {
         super();
-        this.idDireccion = idDireccion;
         this.tipoVia = tipoVia;
         this.nombreVia = nombreVia;
         this.numero = numero;
@@ -37,8 +34,33 @@ public class Direccion implements ElementoBiblioteca {
         this.codigoPostal = codigoPostal;
         this.localidad = localidad;
         this.provincia = provincia;
+        this.idDireccion = getIdFromDB();
     }
     public Direccion(String tipoVia, String nombreVia, int numero, int piso, char portal, int codigoPostal, String localidad, String provincia) {
+        super();
+        this.tipoVia = tipoVia;
+        this.nombreVia = nombreVia;
+        this.numero = numero;
+        this.piso = piso;
+        this.portal = portal;
+        this.codigoPostal = codigoPostal;
+        this.localidad = localidad;
+        this.provincia = provincia;
+        idDireccion = getIdFromDB();
+    }
+    public Direccion(int idDireccion, String tipoVia, String nombreVia, int numero, int codigoPostal, String localidad, String provincia) {
+        super();
+        this.idDireccion = idDireccion;
+        this.tipoVia = tipoVia;
+        this.nombreVia = nombreVia;
+        this.numero = numero;
+        this.piso = piso;
+        this.portal = portal;
+        this.codigoPostal = codigoPostal;
+        this.localidad = localidad;
+        this.provincia = provincia;
+    }
+    public Direccion(int idDireccion, String tipoVia, String nombreVia, int numero, int piso, int codigoPostal, String localidad, String provincia) {
         super();
         this.idDireccion = idDireccion;
         this.tipoVia = tipoVia;
@@ -164,13 +186,13 @@ public class Direccion implements ElementoBiblioteca {
                         + codigoPostal + " AND localidad = '" + localidad + "' AND provincia = '" + provincia + "';";
             } else {
                 selectString = "SELECT * FROM direcciones WHERE tipo_via = '" + tipoVia + "' AND nombre_via = '" + nombreVia
-                        + "' AND numero = '" + numero + "' AND piso = " + piso + " AND portal = '" + portal + "' AND codigo_postal = "
-                        + codigoPostal + " AND localidad = '" + localidad + "' AND provincia = '" + provincia + "';";
+                        + "' AND numero = '" + numero + "' AND piso = " + piso + "' AND codigo_postal = " + codigoPostal
+                        + " AND localidad = '" + localidad + "' AND provincia = '" + provincia + "';";
             }
         } else {
             selectString = "SELECT * FROM direcciones WHERE tipo_via = '" + tipoVia + "' AND nombre_via = '" + nombreVia
-                    + "' AND numero = '" + numero + " AND portal = '" + portal + "' AND codigo_postal = "
-                    + codigoPostal + " AND localidad = '" + localidad + "' AND provincia = '" + provincia + "';";
+                    + "' AND numero = '" + numero + "' AND codigo_postal = " + codigoPostal + " AND localidad = '" + localidad
+                    + "' AND provincia = '" + provincia + "';";
         }
         return selectString;
     }
@@ -184,12 +206,12 @@ public class Direccion implements ElementoBiblioteca {
                         + codigoPostal + ", localidad = '" + localidad + "', provincia = '" + provincia + "';";
             } else {
                 updateString = "UPDATE direcciones SET tipo_via = '" + tipoVia + "', nombre_via = '" + nombreVia
-                        + "', numero = '" + numero + "', piso = " + piso + ", portal = '" + portal + "', codigo_postal = "
-                        + codigoPostal + ", localidad = '" + localidad + "', provincia = '" + provincia + "';";
+                        + "', numero = '" + numero + "', piso = " + piso + "', codigo_postal = " + codigoPostal
+                        + ", localidad = '" + localidad + "', provincia = '" + provincia + "';";
             }
         } else {
             updateString = "UPDATE direcciones SET tipo_via = '" + tipoVia + "', nombre_via = '" + nombreVia
-                    + "', numero = '" + numero + ", portal = '" + portal + "', codigo_postal = " + codigoPostal
+                    + "', numero = '" + numero + "', codigo_postal = " + codigoPostal
                     + ", localidad = '" + localidad + "', provincia = '" + provincia + "';";
         }
         return updateString;
@@ -203,15 +225,9 @@ public class Direccion implements ElementoBiblioteca {
     }
     @Override
     public int getIdFromDB() {
-        int idDireccion = 0;
-        idDireccion = DBHandler.getInt(getSelectString(), 1);
-        return idDireccion;
-    }
-    @Override
-    public int setIdFromDB() {
         int id = 0;
         if (isRegistrado()) {
-            id = getIdFromDB();
+            id = DBHandler.getInt(getSelectString(), 1);
         }
         return id;
     }

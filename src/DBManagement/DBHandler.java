@@ -1,7 +1,6 @@
 package DBManagement;
 
 import Biblioteca.*;
-import Gestion.Lectores;
 import Gestion.Utils;
 import java.sql.*;
 import java.time.Year;
@@ -15,6 +14,7 @@ public class DBHandler {
         ResultSet resultset = null;
         Lector lector;
         Direccion direccion;
+        int idLector;
         String nombre;
         String apellido1;
         String apellido2;
@@ -27,15 +27,29 @@ public class DBHandler {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
             while (resultset.next()){
+                idLector = resultset.getInt("idLector");
                 nombre = resultset.getString("nombre");
                 apellido1 = resultset.getString("apellido1");
-                apellido2 = resultset.getString("apellido2");
                 numeroLector = resultset.getString("numero_lector");
                 telefono = resultset.getString("telefono");
                 email = resultset.getString("email");
                 idDireccion = resultset.getInt("idDireccion");
                 direccion = getDirecciones("SELECT * FROM direcciones WHERE idDireccion = " + idDireccion + ";").get(0);
-                lector = new Lector(nombre, apellido1, apellido2, numeroLector, telefono, email, direccion);
+
+                if (resultset.getString("apellido2") != null) {
+                    apellido2 = resultset.getString("apellido2");
+                    if (resultset.getString("email") != null) {
+                        lector = new Lector(idLector, nombre, apellido1, apellido2, numeroLector, telefono, email, direccion);
+                    } else {
+                        lector = new Lector(idLector, nombre, apellido1, apellido2, numeroLector, telefono, direccion, 0);
+                    }
+                } else {
+                    if (resultset.getString("email") != null) {
+                        lector = new Lector(idLector, nombre, apellido1, numeroLector, telefono, email, direccion);
+                    } else {
+                        lector = new Lector(idLector, nombre, apellido1, numeroLector, telefono, direccion);
+                    }
+                }
                 lectores.add(lector);
             }
         } catch (SQLException e) {
@@ -57,7 +71,8 @@ public class DBHandler {
         ArrayList<Direccion> direcciones = new ArrayList<Direccion>();
         Statement statement = null;
         ResultSet resultset = null;
-        Direccion direccion = null;
+        Direccion direccion;
+        int idDireccion;
         String tipoVia;
         String nombreVia;
         int numero;
@@ -71,6 +86,7 @@ public class DBHandler {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
             while (resultset.next()){
+                idDireccion = resultset.getInt("idDireccion");
                 tipoVia = resultset.getString("tipo_via");
                 nombreVia = resultset.getString("nombre_via");
                 numero = resultset.getInt("numero");
@@ -81,12 +97,12 @@ public class DBHandler {
                 if (!resultset.wasNull()) {
                     portal = resultset.getString("portal").charAt(0);
                     if (!resultset.wasNull()) {
-                        direccion = new Direccion(tipoVia, nombreVia, numero, piso, portal, codigoPostal, localidad, provincia);
+                        direccion = new Direccion(idDireccion, tipoVia, nombreVia, numero, piso, portal, codigoPostal, localidad, provincia);
                     } else {
-                        direccion = new Direccion(tipoVia, nombreVia, numero, piso, codigoPostal, localidad, provincia);
+                        direccion = new Direccion(idDireccion, tipoVia, nombreVia, numero, piso, codigoPostal, localidad, provincia);
                     }
                 } else {
-                    direccion = new Direccion(tipoVia, nombreVia, numero, codigoPostal, localidad, provincia);
+                    direccion = new Direccion(idDireccion,tipoVia, nombreVia, numero, codigoPostal, localidad, provincia);
                 }
                 direcciones.add(direccion);
             }
@@ -110,6 +126,7 @@ public class DBHandler {
         Statement statement = null;
         ResultSet resultset = null;
         Libro libro;
+        int idLibro;
         String titulo;
         Autor autor;
         int idAutor;
@@ -120,12 +137,13 @@ public class DBHandler {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
             while (resultset.next()){
+                idLibro = resultset.getInt("idLibro");
                 titulo = resultset.getString("titulo");
                 idAutor = resultset.getInt("idAutor");
                 autor = getAutores("SELECT * FROM autores WHERE idAutor = " + idAutor + ";").get(0);
                 añoPublicacion = Year.of(resultset.getInt("año_publicacion"));
                 editorial = resultset.getString("editorial");
-                libro = new Libro(titulo, autor, añoPublicacion, editorial);
+                libro = new Libro(idLibro, titulo, autor, añoPublicacion, editorial);
                 libros.add(libro);
             }
         } catch (SQLException e) {
@@ -148,6 +166,7 @@ public class DBHandler {
         ResultSet resultset = null;
         ArrayList<Autor> autores = new ArrayList<Autor>();
         Autor autor;
+        int idAutor;
         String nombre;
         String apellido1;
         String apellido2;
@@ -156,13 +175,14 @@ public class DBHandler {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
             while (resultset.next()){
+                idAutor = resultset.getInt("idAutor");
                 nombre = resultset.getString("nombre");
                 apellido1 = resultset.getString("apellido1");
                 if (resultset.getString("apellido2") != null) {
                     apellido2 = resultset.getString("apellido2");
-                    autor = new Autor(nombre, apellido1, apellido2);
+                    autor = new Autor(idAutor, nombre, apellido1, apellido2);
                 } else {
-                    autor = new Autor(nombre, apellido1);
+                    autor = new Autor(idAutor, nombre, apellido1);
                 }
                 autores.add(autor);
             }

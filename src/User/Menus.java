@@ -1,5 +1,6 @@
 package User;
 
+import Biblioteca.Lector;
 import Gestion.Catalogo;
 import Gestion.Lectores;
 
@@ -32,7 +33,6 @@ public class Menus {
             }
         } while (!salir);
     }
-
     public static void menuCatalogo() {
         int option;
         boolean salir = false;
@@ -55,7 +55,7 @@ public class Menus {
                     break;
                 }
                 case 4: {
-                    menuEliminar();
+                    menuEliminarCatalogo();
                 }
                 case 5: {
                     salir = true;
@@ -127,8 +127,7 @@ public class Menus {
             }
         } while (!salir);
     }
-
-    private static void menuEliminar() {
+    private static void menuEliminarCatalogo() {
         int option;
         boolean salir = false;
         do {
@@ -161,7 +160,7 @@ public class Menus {
         do {
             option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
                     + " \n 1 - Buscar lector;" + "\n 2 - Dar de alta lector;"
-                    + "\n 3 - Modificar datos de lector" + "\n 4 - Dar de baja lector" + "\n 5 - Salir;");
+                    + "\n 3 - Modificar datos de lector" + "\n 4 - Eliminar lector" + "\n 5 - Salir;");
             switch (option) {
                 case 1: {
                     menuBusquedaLectores();
@@ -172,11 +171,11 @@ public class Menus {
                     break;
                 }
                 case 3: {
-                    System.out.println("Sin implementar");
+                    menuActualizarLectores();
                     break;
                 }
                 case 4: {
-                    Lectores.eliminarLector();
+                    Lectores.eliminar();
                 }
                 case 5: {
                     salir = true;
@@ -218,6 +217,29 @@ public class Menus {
                         }
                     } while (!salir);
                     salir = false;
+                    break;
+                }
+                case 3: {
+                    salir = true;
+                    break;
+                }
+            }
+        } while (!salir);
+    }
+
+    private static void menuActualizarLectores() {
+        int option;
+        boolean salir = false;
+        do {
+            option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
+                    + " \n 1 - Modificar los datos de un lector;" + "\n 2 - Modificar la dirección de un lector;" + "\n 3 - Salir;");
+            switch (option) {
+                case 1: {
+                    Lectores.actualizar(1);
+                    break;
+                }
+                case 2: {
+                    Lectores.actualizar(2);
                     break;
                 }
                 case 3: {

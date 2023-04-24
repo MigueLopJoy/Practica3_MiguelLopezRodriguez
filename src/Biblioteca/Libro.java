@@ -19,7 +19,15 @@ public class Libro implements Comparable<Libro>, ElementoBiblioteca {
         this.autor = autor;
         this.añoPublicacion = añoPublicacion;
         this.editorial = editorial;
-        this.idLibro = setIdFromDB();
+        this.idLibro = getIdFromDB();
+    }
+    public Libro(int idLibro, String titulo, Autor autor, Year añoPublicacion, String editorial) {
+        super();
+        this.idLibro = idLibro;
+        this.titulo = titulo;
+        this.autor = autor;
+        this.añoPublicacion = añoPublicacion;
+        this.editorial = editorial;
     }
     public int getIdLibro() {
         return idLibro;
@@ -53,7 +61,7 @@ public class Libro implements Comparable<Libro>, ElementoBiblioteca {
     }
     public String getInsertString() {
         return "INSERT INTO catalogo (titulo, idAutor, año_publicacion, editorial) VALUES ('"
-                + titulo + "', '" + autor.getIdAutor() + "', '" + añoPublicacion + "', '" + editorial + "');";
+                + titulo + "', '" + autor.getIdAutor() + "', '" + añoPublicacion + "',  '" + editorial + "');";
     }
     public String getSelectString() {
         return "SELECT * FROM catalogo WHERE titulo = '" + titulo
@@ -72,6 +80,14 @@ public class Libro implements Comparable<Libro>, ElementoBiblioteca {
     }
     public boolean isRegistrado() {
         return DBHandler.hayRegistros(getSelectString());
+    }
+    @Override
+    public int getIdFromDB() {
+        int id = 0;
+        if (isRegistrado()) {
+            id = DBHandler.getInt(getSelectString(), 1);
+        }
+        return id;
     }
     @Override
     public int compareTo(Libro libro) {

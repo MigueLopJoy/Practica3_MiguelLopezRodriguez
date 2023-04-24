@@ -51,30 +51,29 @@ public class Lectores {
         return libros;
     }
 
-    public static void registrarEjemplar() {
+    public static void registrarLector() {
         Lector lector;
         Direccion direccion;
 
         lector = crearLector();
         direccion = lector.getDireccion();
-
-        if (!direccion.isRegistrado()) {
-            registrarDireccion(direccion);
-        }
+        registrarDireccion(direccion);
         DBHandler.executeUpdate(lector.getInsertString());
     }
+
     private static void registrarDireccion(Direccion direccion) {
         if (!direccion.isRegistrado()) {
             // Registrar autor
             DBHandler.executeUpdate(direccion.getInsertString());
             // Almacenar el id del autor asignado en la BBDD
-            direccion.setIdDireccion(direccion.setIdFromDB());
+            direccion.setIdDireccion(direccion.getIdFromDB());
         }
     }
+
     public static void actualizar(int option) {
         switch (option) {
             case 1: {
-                actualizarLibro();
+                actualizarLector();
                 break;
             }
             case 2: {
@@ -84,22 +83,18 @@ public class Lectores {
         }
     }
 
-    private static void actualizarLibro() {
+    private static void actualizarLector() {
         Lector lector;
         Lector nuevosDatos;
         String sql;
-        int idLector;
 
         if (DBHandler.hayRegistros("SELECT * FROM lectores")) {
-            lector = escogerLector("SELECT * FROM catalogo");
-            idLector = lector.getIdFromDB();
-            System.out.println("Nuevos datos del libro:");
+            lector = escogerLector("SELECT * FROM lectores");
+            System.out.println("Nuevos datos del lector:");
             nuevosDatos = crearLector();
-            nuevosDatos.setIdLector(idLector);
-            if (!nuevosDatos.getDireccion().isRegistrado()) {
-                nuevosDatos.getDireccion().setIdDireccion(lector.getDireccion().getIdDireccion());
-                DBHandler.executeUpdate(nuevosDatos.getDireccion().getUpdateString());
-            }
+            nuevosDatos.setIdLector(lector.getIdLector());
+            registrarDireccion(lector.getDireccion());
+            eliminarDireccion(lector.getDireccion());
             sql = nuevosDatos.getUpdateString();
             DBHandler.executeUpdate(sql);
         } else {
@@ -108,63 +103,60 @@ public class Lectores {
     }
 
     private static void actualizarDireccion() {
-        Lector lector;
         Direccion direccion;
+        Lector lector;
         Direccion nuevosDatos;
         String sql;
-        int idDireccion;
 
         if (DBHandler.hayRegistros("SELECT * FROM direcciones")) {
-            lector = buscar();
-            idDireccion = lector.getIdFromDB();
+            lector = escogerLector("SELECT * FROM lectores");
+            direccion = lector.getDireccion();
             System.out.println("Nueva direccion:");
             nuevosDatos = crearDireccion();
-            nuevosDatos.setIdDireccion(idDireccion);
+            nuevosDatos.setIdDireccion(direccion.getIdDireccion());
             sql = nuevosDatos.getUpdateString();
             DBHandler.executeUpdate(sql);
         } else {
             System.out.println("No hay direcciones registradas");
         }
     }
-    public static void eliminarLector() {
-        Lector lector;
-        if (DBHandler.hayRegistros("SELECT * FROM lectores")) {
-            lector = escogerLector("SELECT * FROM lectores");
-            if (DBHandler.hayRegistros(lector.getSelectString())) {
-                lector.setIdLector(lector.setIdFromDB());
-                if (!DBHandler.hayRegistros("SELECT * FROM direcciones WHERE idLector = " + lector.getIdLector() + ";")) {
-                    DBHandler.executeUpdate(lector.getDeleteString());
-                    eliminarDireccion(lector.getDireccion());
-                } else {
-                    System.out.println("No puede eliminar el lector mientras haya direcciones vinculadas.");
-                }
-            } else {
-                System.out.println("No se ha encontrado al lector");
-            }
+
+    public static void eliminar() {
+        eliminarLector(escogerLector("SELECT * FROM lectores"));
+    }
+
+    private static void eliminarLector(Lector lector) {
+        if (DBHandler.hayRegistros(lector.getSelectString())) {
+            DBHandler.executeUpdate(lector.getDeleteString());
+            eliminarDireccion(lector.getDireccion());
         } else {
-            System.out.println("No hay lectores registrados");
+            System.out.println("No se ha encontrado al lector");
         }
     }
+
     private static void eliminarDireccion(Direccion direccion) {
-        if (DBHandler.hayRegistros("SELECT * FROM direcciones")) {
-            if (DBHandler.hayRegistros(direccion.getSelectString())) {
-                if (!DBHandler.hayRegistros("SELECT * FROM lectores WHERE idDireccion = " + direccion.getIdDireccion() + ";")) {
-                    DBHandler.executeUpdate(direccion.getDeleteString());
-                }
+        if (DBHandler.hayRegistros(direccion.getSelectString())) {
+            if (!DBHandler.hayRegistros("SELECT * FROM lectores WHERE idDireccion = " + direccion.getIdDireccion() + ";")) {
+                DBHandler.executeUpdate(direccion.getDeleteString());
             }
         }
     }
-    private static Lector escogerLector(String sql) {
+
+    public static Lector escogerLector(String sql) {
         ArrayList<Lector> lectores;
-        Lector lector;
+        Lector lector = null;
 
-        lectores = DBHandler.getLectores(sql);
-        System.out.println("Escoja un lector:");
-        mostrarLectores(lectores);
-        lector = lectores.get(pedirDatos.pedirInt(1, lectores.size()) - 1);
-
+        if (DBHandler.hayRegistros(sql)) {
+            lectores = DBHandler.getLectores(sql);
+            System.out.println("Escoja un lector:");
+            mostrarLectores(lectores);
+            lector = lectores.get(pedirDatos.pedirInt(1, lectores.size()) - 1);
+        } else {
+            System.out.println("No se encontraron registros");
+        }
         return lector;
     }
+
     private static void mostrarLectores(ArrayList<Lector> lectores) {
         Lector lector;
         String mensaje;
@@ -176,28 +168,44 @@ public class Lectores {
             System.out.println(mensaje);
         }
     }
+
     private static Lector crearLector() {
         Lector lector;
         String nombre;
         String apellido1;
         String apellido2 = "";
         String telefono;
-        String email;
+        String email = "";
         Direccion direccion;
 
-        nombre = pedirDatos.pedirString(" - Intorduzca el titulo del libro");
+        nombre = pedirDatos.pedirString(" - Intorduzca el nombre del lector");
         apellido1 = pedirDatos.pedirString(" - Intorduzca el primer apellido");
         if (pedirDatos.confirmacion("El lector tiene un segundo apellido? (s/n)")) {
-            apellido2 = pedirDatos.pedirString(" - Intorduzca el titulo del libro");
+            apellido2 = pedirDatos.pedirString(" - Intorduzca el segundo apellido");
         }
         telefono = pedirDatos.pedirString("Introduzca el numero de telefono");
         if (pedirDatos.confirmacion("El lector tiene email? (s/n)")) {
             email = pedirDatos.pedirString("Introduzca el email");
         }
+        System.out.println("Dirección del lector:");
         direccion = crearDireccion();
 
+        if (apellido2 != "") {
+            if (email != "") {
+                lector = new Lector(nombre, apellido1, apellido2, telefono, email, direccion);
+            } else {
+                lector = new Lector(nombre, apellido1, apellido2, telefono, direccion, 0);
+            }
+        } else {
+            if (email != "") {
+                lector = new Lector(nombre, apellido1, telefono, email, direccion);
+            } else {
+                lector = new Lector(nombre, apellido1, telefono, direccion);
+            }
+        }
         return lector;
     }
+
     private static Direccion crearDireccion() {
         Direccion direccion;
         String tipoVia;
@@ -228,7 +236,7 @@ public class Lectores {
             } else {
                 direccion = new Direccion(tipoVia, nombreVia, numero, piso, codigoPostal, localidad, provincia);
             }
-        } else{
+        } else {
             direccion = new Direccion(tipoVia, nombreVia, numero, codigoPostal, localidad, provincia);
         }
         return direccion;

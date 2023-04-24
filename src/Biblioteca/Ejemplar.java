@@ -70,13 +70,9 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
     }
     @Override
     public int getIdFromDB() {
-        return DBHandler.getInt(getSelectString(), 1);
-    }
-    @Override
-    public int setIdFromDB() {
         int idEjemplar = 0;
         if (isRegistrado()) {
-            idEjemplar = getIdFromDB();
+            idEjemplar = DBHandler.getInt(getSelectString(), 1);
         }
         return idEjemplar;
     }
