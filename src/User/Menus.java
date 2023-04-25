@@ -25,7 +25,7 @@ public class Menus {
                     break;
                 }
                 case 3: {
-                    menuPrestamos();
+                    menuCirculacion();
                     break;
                 }
                 case 4: {
@@ -230,7 +230,7 @@ public class Menus {
         } while (!salir);
     }
 
-    public static void menuPrestamos() {
+    public static void menuCirculacion() {
         int option;
         boolean salir = false;
 

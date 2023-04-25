@@ -58,12 +58,12 @@ public class Lectores {
         if (DBHandler.hayRegistros("SELECT * FROM lectores")) {
             lector = escogerLector("SELECT * FROM lectores");
             System.out.println("Nuevos datos del lector:");
-            nuevosDatos = crearLector();
+            nuevosDatos = crearLector(lector.getIdLector());
             nuevosDatos.setIdLector(lector.getIdLector());
             sql = nuevosDatos.getUpdateString();
             DBHandler.executeUpdate(sql);
         } else {
-            System.out.println("No hay libros registrados");
+            System.out.println("No hay lectores registrados");
         }
     }
 
@@ -72,14 +72,16 @@ public class Lectores {
     }
 
     private static void eliminarLector(Lector lector) {
-        if (DBHandler.hayRegistros(lector.getSelectString())) {
-            if (!prestamosVinculados(lector)) {
-                DBHandler.executeUpdate(lector.getDeleteString());
+        if (lector != null) {
+            if (DBHandler.hayRegistros(lector.getSelectString())) {
+                if (!prestamosVinculados(lector)) {
+                    DBHandler.executeUpdate(lector.getDeleteString());
+                } else {
+                    System.out.println("No puede eliminar al lector mientras haya prestamos vinculados");
+                }
             } else {
-                System.out.println("No puede eliminar al lector mientras haya prestamos vinculados");
+                System.out.println("No se ha encontrado al lector");
             }
-        } else {
-            System.out.println("No se ha encontrado al lector");
         }
     }
 
@@ -92,15 +94,14 @@ public class Lectores {
     }
 
     public static Lector escogerLector(String sql) {
-        Lector lector;
+        Lector lector = null;
         String numLector;
 
         if (DBHandler.hayRegistros(sql)) {
             numLector = pedirDatos.pedirCodigo("Introduzca el numero de lector");
-            lector = new Lector(numLector);
+            lector = DBHandler.getLectores("SELECT * FROM lectores WHERE numero_lector = '" + numLector + "';").get(0);
         } else {
-            System.out.println("No se encontraron registros");
-            lector = new Lector();
+            System.out.println("No se encontraron registros de lectores");
         }
         return lector;
     }
@@ -116,23 +117,23 @@ public class Lectores {
         }
     }
     private static Lector crearLector() {
-        Lector lector;
+        Lector lector = null;
         String nombre;
         String apellidos;
         String telefono;
         String email = "";
 
-        nombre = pedirDatos.pedirString(" - Intorduzca el nombre del lector");
-        apellidos = pedirDatos.pedirString(" - Intorduzca los apellidos del lector");
+        nombre = pedirDatos.pedirNombre(" - Intorduzca el nombre del lector");
+        apellidos = pedirDatos.pedirNombre(" - Intorduzca los apellidos del lector");
         do {
-            telefono = pedirDatos.pedirString("Introduzca el numero de telefono");
+            telefono = pedirDatos.pedirTelefono("Introduzca el numero de telefono");
             if (isTelefonoRepetido(telefono)) {
                 System.out.println("Numero de telefono asociado a otro lector");
             }
         } while(isTelefonoRepetido(telefono));
         if (pedirDatos.confirmacion("El lector tiene email? (s/n)")) {
             do {
-                email = pedirDatos.pedirString("Introduzca el email");
+                email = pedirDatos.pedirCorreo("Introduzca el email");
                 if (isEmailRepetido(email)) {
                     System.out.println("Email asociado a otro lector");
                 }
@@ -145,6 +146,37 @@ public class Lectores {
             }
         return lector;
     }
+
+    private static Lector crearLector(int idLector) {
+        Lector lector = null;
+        String nombre;
+        String apellidos;
+        String telefono;
+        String email = "";
+
+        nombre = pedirDatos.pedirNombre(" - Intorduzca el nombre del lector");
+        apellidos = pedirDatos.pedirNombre(" - Intorduzca los apellidos del lector");
+        do {
+            telefono = pedirDatos.pedirTelefono("Introduzca el numero de telefono");
+            if (isTelefonoRepetido(telefono, idLector)) {
+                System.out.println("Numero de telefono asociado a otro lector");
+            }
+        } while(isTelefonoRepetido(telefono, idLector));
+        if (pedirDatos.confirmacion("El lector tiene email? (s/n)")) {
+            do {
+                email = pedirDatos.pedirCorreo("Introduzca el email");
+                if (isEmailRepetido(email, idLector)) {
+                    System.out.println("Email asociado a otro lector");
+                }
+            } while(isEmailRepetido(email, idLector));
+        }
+        if (email != "") {
+            lector = new Lector(nombre, apellidos, telefono, email);
+        } else {
+            lector = new Lector(nombre, apellidos, telefono);
+        }
+        return lector;
+    }
     private static boolean isEmailRepetido(String email) {
         boolean repetido = false;
 
@@ -154,10 +186,30 @@ public class Lectores {
         return repetido;
     }
 
+    private static boolean isEmailRepetido(String email, int idLector) {
+        boolean repetido = false;
+
+        if(DBHandler.hayRegistros("SELECT * FROM lectores WHERE email = '" + email +  " AND idLector != " + idLector + "';")) {
+            repetido = true;
+        }
+        return repetido;
+    }
+
     private static boolean isTelefonoRepetido(String numeroTelefono) {
         boolean repetido = false;
 
-        if(DBHandler.hayRegistros("SELECT * FROM lectores WHERE numero_telefono = '" + numeroTelefono + "';")) {
+        String sql = "SELECT * FROM lectores WHERE numero_telefono = '" + numeroTelefono + "' AND " + "';";
+        if(DBHandler.hayRegistros(sql)) {
+            repetido = true;
+        }
+        return repetido;
+    }
+
+    private static boolean isTelefonoRepetido(String numeroTelefono, int idLector) {
+        boolean repetido = false;
+
+        String sql = "SELECT * FROM lectores WHERE numero_telefono = '" + numeroTelefono + "' AND idLector != " + idLector + "';";
+        if(DBHandler.hayRegistros(sql)) {
             repetido = true;
         }
         return repetido;

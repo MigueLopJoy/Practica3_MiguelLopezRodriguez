@@ -76,7 +76,7 @@ public class DBHandler {
                 nombre = resultset.getString("nombre");
                 apellidos = resultset.getString("apellidos");
                 numeroLector = resultset.getString("numero_lector");
-                telefono = resultset.getString("telefono");
+                telefono = resultset.getString("numero_telefono");
                 email = resultset.getString("email");
                 if (!resultset.wasNull()) {
                     lector = new Lector(idLector, nombre, apellidos, numeroLector, telefono, email);

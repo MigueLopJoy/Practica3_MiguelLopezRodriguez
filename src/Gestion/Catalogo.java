@@ -144,46 +144,56 @@ public class Catalogo {
             }
         }
     }
+
     private static void eliminarEjemplar(Ejemplar ejemplar) {
-        if (DBHandler.hayRegistros(ejemplar.getSelectString())) {
-            if (!prestamosVinculados(ejemplar)) {
-                DBHandler.executeUpdate(ejemplar.getDeleteString());
+        if (ejemplar != null) {
+            if (DBHandler.hayRegistros(ejemplar.getSelectString())) {
+                if (!prestamosVinculados(ejemplar)) {
+                    DBHandler.executeUpdate(ejemplar.getDeleteString());
+                } else {
+                    System.out.println("No puede eliminar el ejemplar mientras haya prestamos vinculados.");
+                }
             } else {
-                System.out.println("No puede eliminar el ejemplar mientras haya prestamos vinculados.");
+                System.out.println("No se encontro el ejemplar");
             }
-        } else {
-            System.out.println("No se encontro el ejemplar");
         }
     }
     private static void eliminarLibro(Libro libro) {
-        if (DBHandler.hayRegistros(libro.getSelectString())) {
-            if (!ejemplaresVinculados(libro)) {
-                DBHandler.executeUpdate(libro.getDeleteString());
+        if (libro != null) {
+            if (DBHandler.hayRegistros(libro.getSelectString())) {
+                if (!ejemplaresVinculados(libro)) {
+                    DBHandler.executeUpdate(libro.getDeleteString());
+                } else {
+                    System.out.println("No puede eliminar el libro mientras haya ejemplares vinculados.");
+                }
             } else {
-                System.out.println("No puede eliminar el libro mientras haya ejemplares vinculados.");
+                System.out.println("No se encontro el libro");
             }
-        } else {
-            System.out.println("No se ha encontrado el libro");
         }
     }
+
     private static void eliminarAutor(Autor autor) {
-        if (DBHandler.hayRegistros(autor.getSelectString())) {
-            if (!librosVinculados(autor)) {
-                DBHandler.executeUpdate(autor.getDeleteString());
+        if (autor != null) {
+            if (DBHandler.hayRegistros(autor.getSelectString())) {
+                if (!librosVinculados(autor)) {
+                    DBHandler.executeUpdate(autor.getDeleteString());
+                } else {
+                    System.out.println("No puede eliminar el autor mientras haya libros vinculados.");
+                }
             } else {
-                System.out.println("No puede eliminar el autor mientras haya libros vinculados.");
+                System.out.println("No se encontro el autor");
             }
-        } else {
-            System.out.println("No se ha encontrado el autor");
         }
     }
+
     private static boolean prestamosVinculados(Ejemplar ejemplar) {
         boolean prestamosVinuclados = false;
-        if (DBHandler.hayRegistros("SELECT * FROM prestamos WHERE idEjemplar = " + ejemplar.getIdEjemplar() + ";")){
+        if (DBHandler.hayRegistros("SELECT * FROM prestamos WHERE idEjemplar = " + ejemplar.getIdEjemplar() + ";")) {
             prestamosVinuclados = true;
         }
         return prestamosVinuclados;
     }
+
     private static boolean ejemplaresVinculados(Libro libro) {
         boolean ejemplaresVinculados = false;
         if (DBHandler.hayRegistros("SELECT * FROM ejemplares WHERE idLibro = " + libro.getIdLibro() + ";")) {
@@ -191,6 +201,7 @@ public class Catalogo {
         }
         return ejemplaresVinculados;
     }
+
     private static boolean librosVinculados(Autor autor) {
         boolean librosVinculados = false;
         if (DBHandler.hayRegistros("SELECT * FROM catalogo WHERE idAutor = " + autor.getIdAutor() + ";")) {
@@ -198,16 +209,16 @@ public class Catalogo {
         }
         return librosVinculados;
     }
+
     public static Ejemplar escogerEjemplar(String sql) {
-        Ejemplar ejemplar;
+        Ejemplar ejemplar = null;
         String codigoEjemplar;
 
         if (DBHandler.hayRegistros(sql)) {
             codigoEjemplar = pedirDatos.pedirCodigo("Introduzca el codigo del ejemplar");
-            ejemplar = new Ejemplar(codigoEjemplar);
+            ejemplar = DBHandler.getEjemplares("SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + codigoEjemplar + "';").get(0);
         } else {
-            System.out.println("No se encontraron registros");
-            ejemplar = new Ejemplar();
+            System.out.println("No se encontraron ejemplares registrados");
         }
         return ejemplar;
     }
@@ -222,9 +233,8 @@ public class Catalogo {
             mostrarLibros(libros);
             libro = libros.get(pedirDatos.pedirInt(1, libros.size()) - 1);
         } else {
-            System.out.println("No se encontraron registros");
+            System.out.println("No se encontraron registros en el catalogo");
         }
-
         return libro;
     }
 
@@ -238,7 +248,7 @@ public class Catalogo {
             mostrarAutores(autores);
             autor = autores.get(pedirDatos.pedirInt(1, autores.size()) - 1);
         } else {
-            System.out.println("No se encontraronr registros");
+            System.out.println("No se encontraronr autores registrados");
         }
         return autor;
     }

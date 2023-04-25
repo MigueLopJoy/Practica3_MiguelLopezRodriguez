@@ -114,10 +114,10 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
         return codigoEjemplar;
     }
 
-    private static boolean isRepetido(String codigoEjemplar) {
+    private boolean isRepetido(String codigoEjemplar) {
         boolean repetido = false;
 
-        if(DBHandler.hayRegistros("SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + codigoEjemplar + "';")) {
+        if(DBHandler.hayRegistros(getSelectString())){
             repetido = true;
         }
         return repetido;

@@ -11,26 +11,11 @@ public class Utils {
                 textoMayusculas += (palabraTexto.toUpperCase().charAt(0) + palabraTexto.substring(1, palabraTexto.length()) + " ");
             }
         }
-        textoMayusculas.trim();
+        textoMayusculas = textoMayusculas.trim();
+        System.out.println(textoMayusculas);
 
         return textoMayusculas;
     }
-
-    public static String convertirMinuscula(String texto) {
-        String[] palabrasTexto;
-        String textoMayusculas = "";
-
-        palabrasTexto = texto.split(" ");
-        for (String palabraTexto : palabrasTexto) {
-            if (palabraTexto.length() > 0 && Character.isLetter(palabraTexto.charAt(0))) {
-                textoMayusculas += (palabraTexto.toUpperCase().charAt(0) + palabraTexto.substring(1, palabraTexto.length()) + " ");
-            }
-        }
-        textoMayusculas.trim();
-
-        return textoMayusculas;
-    }
-
     public static boolean validarNombre(String nombre) {
         boolean nombreValido = false;
 
@@ -40,6 +25,17 @@ public class Utils {
             System.out.println("Nombre no valido");
         }
         return nombreValido;
+    }
+
+    public static boolean validarTelefono(String telefono) {
+        boolean telefonoValido = false;
+
+        if (telefono.matches("^[0-9]{9}$")) {
+            telefonoValido = true;
+        } else {
+            System.out.println("Telefono no valido");
+        }
+        return telefonoValido;
     }
 
     public static boolean validarCorreo(String correo) {

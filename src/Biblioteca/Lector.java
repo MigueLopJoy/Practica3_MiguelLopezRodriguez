@@ -80,14 +80,12 @@ public class Lector extends Persona implements ElementoBiblioteca {
     @Override
     public String getInsertString() {
         String insertString;
-        System.out.println(email == null);
-        System.out.println(email);
         if (email != null) {
-            insertString = "INSERT INTO lectores (nombre, apellidos, numero_lector, telefono, email) " +
+            insertString = "INSERT INTO lectores (nombre, apellidos, numero_lector, numero_telefono, email) " +
                     "VALUES ('" + getNombre() + "', '" + getApellidos() + "', '" + numeroLector
                     + "', '" + telefono + "', '" + email + "');";
         } else {
-            insertString = "INSERT INTO lectores (nombre, apellidos, numero_lector, telefono) " +
+            insertString = "INSERT INTO lectores (nombre, apellidos, numero_lector, numero_telefono) " +
                     "VALUES ('" + getNombre() + "', '" + getApellidos() + "', '" + numeroLector
                     + "', '" + telefono + "');";
         }
@@ -100,10 +98,10 @@ public class Lector extends Persona implements ElementoBiblioteca {
 
         if (email != null) {
             selectString = "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellidos = '" + getApellidos()
-                    + "' AND numero_lector = '" + numeroLector + "' AND telefono = '" + telefono + "' AND email = '" + email + "';";
+                    + "' AND numero_lector = '" + numeroLector + "' AND numero_telefono = '" + telefono + "' AND email = '" + email + "';";
         } else {
             selectString = "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellidos = '" + getApellidos()
-                    + "' AND numero_lector = '" + numeroLector + "' AND telefono = '" + telefono + "';";
+                    + "' AND numero_lector = '" + numeroLector + "' AND numero_telefono = '" + telefono + "';";
         }
         return selectString;
     }
@@ -113,11 +111,11 @@ public class Lector extends Persona implements ElementoBiblioteca {
         String updateString;
         if (email != null) {
             updateString = "UPDATE lectores SET nombre = '" + getNombre() + "', apellidos = '" + getApellidos()
-                    + "', numero_lector = '" + numeroLector + "', telefono = '" + telefono + "', email = '" + email
+                    + "', numero_lector = '" + numeroLector + "', numero_telefono = '" + telefono + "', email = '" + email
                     + "' WHERE idLector = " + idLector;
         } else {
             updateString = "UPDATE lectores SET nombre = '" + getNombre() + "', apellidos = '" + getApellidos()
-                    + "', numero_lector = '" + numeroLector + "', telefono = '" + telefono + "' WHERE idLector = " + idLector;
+                    + "', numero_lector = '" + numeroLector + "', numero_telefono = '" + telefono + "' WHERE idLector = " + idLector;
         }
         return updateString;
     }

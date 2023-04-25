@@ -17,20 +17,22 @@ public class Prestamos {
         ejemplar = Catalogo.escogerEjemplar("SELECT * FROM ejemplares");
         lector = Lectores.escogerLector("SELECT * FROM lectores");
 
-        if (DBHandler.hayRegistros(ejemplar.getSelectString())) {
-            if (DBHandler.hayRegistros(lector.getSelectString())) {
-                if (!isPrestado(ejemplar)) {
-                    prestamo = new Prestamo(ejemplar, lector);
-                    DBHandler.executeUpdate(prestamo.getInsertString());
-                    System.out.println("Prestamo efectuado con exito");
+        if (ejemplar != null && lector != null) {
+            if (DBHandler.hayRegistros(ejemplar.getSelectString())) {
+                if (DBHandler.hayRegistros(lector.getSelectString())) {
+                    if (!isPrestado(ejemplar)) {
+                        prestamo = new Prestamo(ejemplar, lector);
+                        DBHandler.executeUpdate(prestamo.getInsertString());
+                        System.out.println("Prestamo efectuado con exito");
+                    } else {
+                        System.out.println("El ejemplar ya esta prestado");
+                    }
                 } else {
-                    System.out.println("El ejemplar ya esta prestado");
+                    System.out.println("No se encontro el lector");
                 }
             } else {
-                System.out.println("No se encontro el lector");
+                System.out.println("No se encontro el ejemplar");
             }
-        } else {
-            System.out.println("No se encontro el ejemplar");
         }
     }
 
@@ -40,18 +42,19 @@ public class Prestamos {
 
         ejemplar = Catalogo.escogerEjemplar("SELECT * FROM ejemplares");
 
-        if (DBHandler.hayRegistros(ejemplar.getSelectString())) {
-            if (isPrestado(ejemplar)) {
-                prestamo = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE idEjemplar = " + ejemplar.getIdEjemplar() + ";").get(0);
-                DBHandler.executeUpdate(prestamo.getUpdateString());
-                System.out.println("Ejemplar devuelto con exito");
+        if (ejemplar != null) {
+            if (DBHandler.hayRegistros(ejemplar.getSelectString())) {
+                if (isPrestado(ejemplar)) {
+                    prestamo = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE idEjemplar = " + ejemplar.getIdEjemplar() + ";").get(0);
+                    DBHandler.executeUpdate(prestamo.getUpdateString());
+                    System.out.println("Ejemplar devuelto con exito");
+                } else {
+                    System.out.println("El ejemplar no esta prestado");
+                }
             } else {
-                System.out.println("El ejemplar no esta prestado");
+                System.out.println("No se encontro el ejemplar");
             }
-        } else {
-            System.out.println("No se encontro el ejemplar");
         }
-
     }
 
     public static void consultarPrestamos(int option) {

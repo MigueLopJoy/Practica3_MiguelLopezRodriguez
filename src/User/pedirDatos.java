@@ -31,12 +31,19 @@ public class pedirDatos {
 	public static String pedirCorreo(String texto) {
 		String correo;
 		do {
-			correo = pedirDatos.pedirString(texto);
-			correo = Utils.convertirMinusculas(correo);
+			correo = pedirString(texto);
+			correo = correo.toLowerCase();
 		} while (!Utils.validarCorreo(correo));
 		return correo;
 	}
 
+	public static String pedirTelefono(String texto) {
+		String telefono;
+		do {
+			telefono = pedirString(texto);
+		} while (!Utils.validarTelefono(telefono));
+		return telefono;
+	}
 	public static String pedirString(String texto) {
 		String retorno;
 		do {
@@ -45,6 +52,7 @@ public class pedirDatos {
 			if (retorno.isEmpty() || retorno.trim().isEmpty()) {
 				System.out.println("Debe introducir algún dato");
 			}
+			retorno = retorno.trim();
 		} while (retorno.isEmpty() || retorno.trim().isEmpty());
 		return retorno;
 	}
