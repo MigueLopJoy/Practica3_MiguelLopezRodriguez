@@ -6,21 +6,12 @@ public class Autor extends Persona implements ElementoBiblioteca {
     public Autor() {
         super();
     }
-    public Autor(String nombre, String apellido1) {
-        super(nombre, apellido1);
+    public Autor(String nombre, String apellidos) {
+        super(nombre, apellidos);
         this.idAutor = getIdFromDB();
     }
-    public Autor(String nombre, String apellido1, String apellido2) {
-        super(nombre, apellido1, apellido2);
-        this.idAutor = getIdFromDB();
-    }
-
-    public Autor(int idAutor, String nombre, String apellido1) {
-        super(nombre, apellido1);
-        this.idAutor = idAutor;
-    }
-    public Autor(int idAutor, String nombre, String apellido1, String apellido2) {
-        super(nombre, apellido1, apellido2);
+    public Autor(int idAutor, String nombre, String apellidos) {
+        super(nombre, apellidos);
         this.idAutor = idAutor;
     }
     public int getIdAutor() {
@@ -30,37 +21,16 @@ public class Autor extends Persona implements ElementoBiblioteca {
         this.idAutor = idAutor;
     }
     public String getInsertString() {
-        String inserString;
-        if (getApellido2() != null) {
-            inserString = "INSERT INTO autores (nombre, apellido1, apellido2) VALUES ('"
-                    + getNombre() + "', '" + getApellido1() + "', '" + getApellido2() + "');";
-        } else {
-            inserString = "INSERT INTO autores (nombre, apellido1) VALUES ('"
-                    + getNombre() + "', '" + getApellido1() + "');";
-        }
-        return  inserString;
+        return "INSERT INTO autores (nombre, apellidos) VALUES ('"
+                    + getNombre() + "', '" + getApellidos() + "');";
     }
     public String getSelectString() {
-        String selectString;
-        if (getApellido2() != null) {
-            selectString = "SELECT * FROM autores WHERE nombre = '" + getNombre()
-                    + "' AND apellido1 = '" + getApellido1() + "' AND apellido2 = '" + getApellido2() + "';";
-        } else {
-            selectString = "SELECT * FROM autores WHERE nombre = '" + getNombre()
-                    + "' AND apellido1 = '" + getApellido1() + "';";
-        }
-        return  selectString;
+        return "SELECT * FROM autores WHERE nombre = '" + getNombre()
+                    + "' AND apellidos = '" + getApellidos() + "';";
     }
     public String getUpdateString() {
-        String updateString;
-        if (getApellido2() != null) {
-            updateString = "UPDATE autores SET nombre = '" + getNombre() + "', apellido1 = '" + getApellido1()
-                    + "', apellido2 = '" + getApellido2() + "' WHERE idAutor = " + idAutor + ";";
-        } else {
-            updateString = "UPDATE autores SET nombre = '" + getNombre() + "', apellido1 = '"
-                    + getApellido1() + "' WHERE idAutor = " + idAutor + ";";
-        }
-        return updateString;
+        return "UPDATE autores SET nombre = '" + getNombre() + "', apellidos = '"
+                    + getApellidos() + "' WHERE idAutor = " + idAutor + ";";
     }
     public String getDeleteString() {
         return "DELETE FROM autores WHERE idAutor = " + idAutor;

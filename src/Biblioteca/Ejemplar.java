@@ -6,6 +6,10 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
     private String codigoEjemplar;
     private Libro libro;
 
+    public Ejemplar () {
+        super();
+    }
+
     public Ejemplar (String codigoEjemplar) {
         this.codigoEjemplar = codigoEjemplar;
     }
@@ -21,7 +25,7 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
         this.libro = libro;
         this.idEjemplar = getIdFromDB();
     }
-    public Ejemplar(int idEjemplar, String codigoEjemplar, int idLibro) {
+    public Ejemplar(int idEjemplar, String codigoEjemplar, Libro libro) {
         super();
         this.idEjemplar = idEjemplar;
         this.codigoEjemplar = codigoEjemplar;
@@ -78,7 +82,7 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
     }
     @Override
     public String toString() {
-        return codigoEjemplar + " - " + libro.toString();
+        return codigoEjemplar + ": " + libro.toString();
     }
     @Override
     public int compareTo(Ejemplar ejemplar) {
@@ -88,12 +92,9 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
         if (resultadoComparacion == 0) {
             resultadoComparacion = libro.getAutor().getNombre().compareTo(ejemplar.getLibro().getAutor().getNombre());
             if (resultadoComparacion == 0) {
-                resultadoComparacion = libro.getAutor().getApellido1().compareTo(ejemplar.getLibro().getAutor().getApellido1());
+                resultadoComparacion = libro.getAutor().getApellidos().compareTo(ejemplar.getLibro().getAutor().getApellidos());
                 if (resultadoComparacion == 0) {
-                    resultadoComparacion = libro.getAutor().getApellido2().compareTo(ejemplar.getLibro().getAutor().getApellido2());
-                    if (resultadoComparacion == 0) {
-                        resultadoComparacion = codigoEjemplar.compareTo(ejemplar.codigoEjemplar);
-                    }
+                    resultadoComparacion = codigoEjemplar.compareTo(ejemplar.codigoEjemplar);
                 }
             }
         }
@@ -103,12 +104,22 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
         String codigoEjemplar = "";
         char[] letras = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 
-        for (int i = 0; i < 6; i++) {
-            codigoEjemplar += (int)(Math.random()*10);
-        }
-        for (int i = 0; i < 2; i++) {
+        do {
+            for (int i = 0; i < 8; i++) {
+                codigoEjemplar += (int)(Math.random()*10);
+            }
             codigoEjemplar += letras[(int)(Math.random() * 26)];
-        }
+        } while (isRepetido(codigoEjemplar));
+
         return codigoEjemplar;
+    }
+
+    private static boolean isRepetido(String codigoEjemplar) {
+        boolean repetido = false;
+
+        if(DBHandler.hayRegistros("SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + codigoEjemplar + "';")) {
+            repetido = true;
+        }
+        return repetido;
     }
 }

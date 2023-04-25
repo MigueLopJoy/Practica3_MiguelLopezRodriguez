@@ -70,10 +70,9 @@ public class Libro implements Comparable<Libro>, ElementoBiblioteca {
                 + "' AND editorial = '" + editorial + "';";
     }
     public String getUpdateString() {
-        return "UPDATE catalogo SET titulo = '" + titulo
-                + "', idAutor = " + autor.getIdAutor()
-                + "', año_publicacion = " + añoPublicacion
-                + ", editorial = '" + editorial + "' WHERE idLibro = " + idLibro;
+        return "UPDATE catalogo SET titulo = '" + titulo + "', idAutor = " + autor.getIdAutor()
+                + ", año_publicacion = " + añoPublicacion + ", editorial = '" + editorial
+                + "' WHERE idLibro = " + idLibro;
     }
     public String getDeleteString() {
         return "DELETE FROM catalogo WHERE idLibro = " + idLibro;
@@ -89,6 +88,11 @@ public class Libro implements Comparable<Libro>, ElementoBiblioteca {
         }
         return id;
     }
+
+    @Override
+    public String toString() {
+        return titulo + " / " + autor.toString() + " - " + editorial + ", " + añoPublicacion;
+    }
     @Override
     public int compareTo(Libro libro) {
         int resultadoComparacion;
@@ -97,10 +101,7 @@ public class Libro implements Comparable<Libro>, ElementoBiblioteca {
         if (resultadoComparacion == 0) {
             resultadoComparacion = autor.getNombre().compareTo(libro.getAutor().getNombre());
             if (resultadoComparacion == 0) {
-                resultadoComparacion = autor.getApellido1().compareTo(libro.getAutor().getApellido1());
-                if (resultadoComparacion == 0) {
-                    resultadoComparacion = autor.getApellido2().compareTo(libro.getAutor().getApellido2());
-                }
+                resultadoComparacion = autor.getApellidos().compareTo(libro.getAutor().getApellidos());
             }
         }
         return resultadoComparacion;

@@ -1,21 +1,66 @@
 package Gestion;
 
 public class Utils {
-    public static String convertirMayuscula(String texto) {
+    public static String convertirPrimeraMayuscula(String texto) {
+        String[] palabrasTexto;
         String textoMayusculas = "";
-        textoMayusculas = texto.toUpperCase().charAt(0) + texto.substring(1, texto.length());
+
+        palabrasTexto = texto.split(" ");
+        for (String palabraTexto : palabrasTexto) {
+            if (palabraTexto.length() > 0 && Character.isLetter(palabraTexto.charAt(0))) {
+                textoMayusculas += (palabraTexto.toUpperCase().charAt(0) + palabraTexto.substring(1, palabraTexto.length()) + " ");
+            }
+        }
+        textoMayusculas.trim();
+
+        return textoMayusculas;
+    }
+
+    public static String convertirMinuscula(String texto) {
+        String[] palabrasTexto;
+        String textoMayusculas = "";
+
+        palabrasTexto = texto.split(" ");
+        for (String palabraTexto : palabrasTexto) {
+            if (palabraTexto.length() > 0 && Character.isLetter(palabraTexto.charAt(0))) {
+                textoMayusculas += (palabraTexto.toUpperCase().charAt(0) + palabraTexto.substring(1, palabraTexto.length()) + " ");
+            }
+        }
+        textoMayusculas.trim();
+
         return textoMayusculas;
     }
 
     public static boolean validarNombre(String nombre) {
         boolean nombreValido = false;
 
-        if (nombre.matches("^[A-ZÁÉÍÓÚÑ][a-záéíóúñ&]+(\\s[A-ZÁÉÍÓÚÑ][a-záéíóúñ&]+)*$")) {
+        if (nombre.matches("^[a-zA-ZÁÉÍÓÚáéíóúÑñ]+(\\s[A-Za-zÁÉÍÓÚáéíóúÑñ]+)*$")) {
             nombreValido = true;
         } else {
             System.out.println("Nombre no valido");
         }
         return nombreValido;
+    }
+
+    public static boolean validarCorreo(String correo) {
+        boolean correoValido = false;
+
+        if (correo.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            correoValido = true;
+        } else {
+            System.out.println("Nombre no valido");
+        }
+        return correoValido;
+    }
+    public static boolean validarCodigo(String codigo) {
+        boolean codigoValido = false;
+
+        if (codigo.matches("^[0-9]{8}[A-Z]$")){
+            codigoValido = true;
+        } else {
+            System.out.println("Codigo no valido");
+        }
+        return codigoValido;
     }
 
     public static String obtenerMensajeExecuteUpdate(String sql) {

@@ -1,19 +1,14 @@
 package Gestion;
 
-import Biblioteca.Autor;
-import Biblioteca.Direccion;
-import Biblioteca.Lector;
-import Biblioteca.Libro;
+import Biblioteca.*;
 import DBManagement.DBHandler;
 import User.pedirDatos;
-
-import java.time.Year;
 import java.util.ArrayList;
-import java.util.Collections;ç
+import java.util.Collections;
 
 public class Lectores {
     public static void consultarLectores(int option) {
-        if (DBHandler.hayRegistros("SELECT * FROM catalogo")) {
+        if (DBHandler.hayRegistros("SELECT * FROM lectores")) {
             ArrayList<Lector> lectores = buscar(option);
             System.out.println("Lectores encontrados: " + lectores.size());
             mostrarLectores(lectores);
@@ -26,64 +21,36 @@ public class Lectores {
         ArrayList<Lector> lectores = new ArrayList<Lector>();
         Lector lector;
         String sql;
-        String numeroLector;
+        String nombre;
+        String apellidos;
 
         switch (option) {
             case 1: {
-                libros = DBHandler.getLectores("SELECT * FROM lectores");
+                lectores = DBHandler.getLectores("SELECT * FROM lectores");
                 break;
             }
             case 2: {
-                lector = crearLector();
-                sql = "SELECT * FROM lectores c INNER JOIN autores a ON c.idAutor = a.idAutor WHERE nombre = '"
-                        + autor.getNombre() + "' AND apellido1 = '" + autor.getApellido1() + "' AND apellido2 = '"
-                        + autor.getApellido2() + "';";
-                lectores = DBHandler.getLibros(sql);
-                break;
-            }
-            case 3: {
-                numeroLector = pedirDatos.pedirString("Introduzca el numero de lector");
-                sql = "SELECT * FROM catalogo WHERE titulo = '" + numeroLector + "';";
+                nombre = pedirDatos.pedirString(" - Intorduzca el nombre del lector");
+                apellidos = pedirDatos.pedirString(" - Intorduzca los apellidos del lector");
+
+                sql = "SELECT * FROM lectores WHERE nombre = '" + nombre + "' AND apellidos = '" + apellidos + "';";
                 lectores = DBHandler.getLectores(sql);
                 break;
             }
+            case 3: {
+                lector = escogerLector("SELECT * FROM lectores");
+                lectores.add(lector);
+                break;
+            }
         }
-        return libros;
+        return lectores;
     }
-
     public static void registrarLector() {
-        Lector lector;
-        Direccion direccion;
-
-        lector = crearLector();
-        direccion = lector.getDireccion();
-        registrarDireccion(direccion);
+        Lector lector = crearLector();
         DBHandler.executeUpdate(lector.getInsertString());
     }
 
-    private static void registrarDireccion(Direccion direccion) {
-        if (!direccion.isRegistrado()) {
-            // Registrar autor
-            DBHandler.executeUpdate(direccion.getInsertString());
-            // Almacenar el id del autor asignado en la BBDD
-            direccion.setIdDireccion(direccion.getIdFromDB());
-        }
-    }
-
-    public static void actualizar(int option) {
-        switch (option) {
-            case 1: {
-                actualizarLector();
-                break;
-            }
-            case 2: {
-                actualizarDireccion();
-                break;
-            }
-        }
-    }
-
-    private static void actualizarLector() {
+    public static void actualizarLector() {
         Lector lector;
         Lector nuevosDatos;
         String sql;
@@ -93,31 +60,10 @@ public class Lectores {
             System.out.println("Nuevos datos del lector:");
             nuevosDatos = crearLector();
             nuevosDatos.setIdLector(lector.getIdLector());
-            registrarDireccion(lector.getDireccion());
-            eliminarDireccion(lector.getDireccion());
             sql = nuevosDatos.getUpdateString();
             DBHandler.executeUpdate(sql);
         } else {
             System.out.println("No hay libros registrados");
-        }
-    }
-
-    private static void actualizarDireccion() {
-        Direccion direccion;
-        Lector lector;
-        Direccion nuevosDatos;
-        String sql;
-
-        if (DBHandler.hayRegistros("SELECT * FROM direcciones")) {
-            lector = escogerLector("SELECT * FROM lectores");
-            direccion = lector.getDireccion();
-            System.out.println("Nueva direccion:");
-            nuevosDatos = crearDireccion();
-            nuevosDatos.setIdDireccion(direccion.getIdDireccion());
-            sql = nuevosDatos.getUpdateString();
-            DBHandler.executeUpdate(sql);
-        } else {
-            System.out.println("No hay direcciones registradas");
         }
     }
 
@@ -127,36 +73,37 @@ public class Lectores {
 
     private static void eliminarLector(Lector lector) {
         if (DBHandler.hayRegistros(lector.getSelectString())) {
-            DBHandler.executeUpdate(lector.getDeleteString());
-            eliminarDireccion(lector.getDireccion());
+            if (!prestamosVinculados(lector)) {
+                DBHandler.executeUpdate(lector.getDeleteString());
+            } else {
+                System.out.println("No puede eliminar al lector mientras haya prestamos vinculados");
+            }
         } else {
             System.out.println("No se ha encontrado al lector");
         }
     }
 
-    private static void eliminarDireccion(Direccion direccion) {
-        if (DBHandler.hayRegistros(direccion.getSelectString())) {
-            if (!DBHandler.hayRegistros("SELECT * FROM lectores WHERE idDireccion = " + direccion.getIdDireccion() + ";")) {
-                DBHandler.executeUpdate(direccion.getDeleteString());
-            }
+    private static boolean prestamosVinculados(Lector lector) {
+        boolean prestamosVinuclados = false;
+        if (DBHandler.hayRegistros("SELECT * FROM prestamos WHERE idEjemplar = " + lector.getIdLector() + ";")){
+            prestamosVinuclados = true;
         }
+        return prestamosVinuclados;
     }
 
     public static Lector escogerLector(String sql) {
-        ArrayList<Lector> lectores;
-        Lector lector = null;
+        Lector lector;
+        String numLector;
 
         if (DBHandler.hayRegistros(sql)) {
-            lectores = DBHandler.getLectores(sql);
-            System.out.println("Escoja un lector:");
-            mostrarLectores(lectores);
-            lector = lectores.get(pedirDatos.pedirInt(1, lectores.size()) - 1);
+            numLector = pedirDatos.pedirCodigo("Introduzca el numero de lector");
+            lector = new Lector(numLector);
         } else {
             System.out.println("No se encontraron registros");
+            lector = new Lector();
         }
         return lector;
     }
-
     private static void mostrarLectores(ArrayList<Lector> lectores) {
         Lector lector;
         String mensaje;
@@ -168,77 +115,51 @@ public class Lectores {
             System.out.println(mensaje);
         }
     }
-
     private static Lector crearLector() {
         Lector lector;
         String nombre;
-        String apellido1;
-        String apellido2 = "";
+        String apellidos;
         String telefono;
         String email = "";
-        Direccion direccion;
 
         nombre = pedirDatos.pedirString(" - Intorduzca el nombre del lector");
-        apellido1 = pedirDatos.pedirString(" - Intorduzca el primer apellido");
-        if (pedirDatos.confirmacion("El lector tiene un segundo apellido? (s/n)")) {
-            apellido2 = pedirDatos.pedirString(" - Intorduzca el segundo apellido");
-        }
-        telefono = pedirDatos.pedirString("Introduzca el numero de telefono");
+        apellidos = pedirDatos.pedirString(" - Intorduzca los apellidos del lector");
+        do {
+            telefono = pedirDatos.pedirString("Introduzca el numero de telefono");
+            if (isTelefonoRepetido(telefono)) {
+                System.out.println("Numero de telefono asociado a otro lector");
+            }
+        } while(isTelefonoRepetido(telefono));
         if (pedirDatos.confirmacion("El lector tiene email? (s/n)")) {
-            email = pedirDatos.pedirString("Introduzca el email");
+            do {
+                email = pedirDatos.pedirString("Introduzca el email");
+                if (isEmailRepetido(email)) {
+                    System.out.println("Email asociado a otro lector");
+                }
+            } while(isEmailRepetido(email));
         }
-        System.out.println("Dirección del lector:");
-        direccion = crearDireccion();
-
-        if (apellido2 != "") {
-            if (email != "") {
-                lector = new Lector(nombre, apellido1, apellido2, telefono, email, direccion);
+        if (email != "") {
+                lector = new Lector(nombre, apellidos, telefono, email);
             } else {
-                lector = new Lector(nombre, apellido1, apellido2, telefono, direccion, 0);
+                lector = new Lector(nombre, apellidos, telefono);
             }
-        } else {
-            if (email != "") {
-                lector = new Lector(nombre, apellido1, telefono, email, direccion);
-            } else {
-                lector = new Lector(nombre, apellido1, telefono, direccion);
-            }
-        }
         return lector;
     }
+    private static boolean isEmailRepetido(String email) {
+        boolean repetido = false;
 
-    private static Direccion crearDireccion() {
-        Direccion direccion;
-        String tipoVia;
-        String nombreVia;
-        int numero;
-        int piso = 0;
-        char portal = '\u0000';
-        int codigoPostal;
-        String localidad;
-        String provincia;
-
-        tipoVia = pedirDatos.pedirNombre(" - Introduzca el tipo de via");
-        nombreVia = pedirDatos.pedirNombre(" - Introduzca el nombre de la via");
-        numero = pedirDatos.pedirInt("Introduzca el numero", 1, 500);
-        if (pedirDatos.confirmacion("La vivienda tiene varias plantas? (s/n)")) {
-            piso = pedirDatos.pedirInt("Introduzca la planta", 1, 30);
-            if (pedirDatos.confirmacion("La planta tiene varios portales? (s/n)")) {
-                portal = pedirDatos.pedirString("Introduzca el portal").charAt(0);
-            }
+        if(DBHandler.hayRegistros("SELECT * FROM lectores WHERE email = '" + email + "';")) {
+            repetido = true;
         }
-        codigoPostal = pedirDatos.pedirInt("Introduzca el codigo postañ", 11111, 99999);
-        localidad = pedirDatos.pedirNombre("Introduzca el nombre de la localidad");
-        provincia = pedirDatos.pedirNombre("Introduzca el nombre de la provincia");
+        return repetido;
+    }
 
-        if (piso != 0) {
-            if (portal != '\u0000') {
-                direccion = new Direccion(tipoVia, nombreVia, numero, piso, portal, codigoPostal, localidad, provincia);
-            } else {
-                direccion = new Direccion(tipoVia, nombreVia, numero, piso, codigoPostal, localidad, provincia);
-            }
-        } else {
-            direccion = new Direccion(tipoVia, nombreVia, numero, codigoPostal, localidad, provincia);
+    private static boolean isTelefonoRepetido(String numeroTelefono) {
+        boolean repetido = false;
+
+        if(DBHandler.hayRegistros("SELECT * FROM lectores WHERE numero_telefono = '" + numeroTelefono + "';")) {
+            repetido = true;
         }
-        return direccion;
+        return repetido;
     }
 }

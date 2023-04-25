@@ -2,10 +2,58 @@ package DBManagement;
 
 import Biblioteca.*;
 import Gestion.Utils;
+
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
+
 public class DBHandler {
+
+    public static ArrayList<Prestamo> getPrestamos(String sql) {
+        DBConnection dbConnection = new DBConnection("root", "1234");
+        Connection connection = dbConnection.getConnection();
+        ArrayList<Prestamo> prestamos = new ArrayList<Prestamo>();
+        Statement statement = null;
+        ResultSet resultset = null;
+        Prestamo prestamo;
+        int idPrestamo;
+        Ejemplar ejemplar;
+        int idEjemplar;
+        Lector lector;
+        int idLector;
+        LocalDate fechaPrestamo;
+        LocalDate fechaDevolucion;
+        Boolean devuelto;
+
+        try {
+            statement = connection.createStatement();
+            resultset = statement.executeQuery(sql);
+            while (resultset.next()) {
+                idPrestamo = resultset.getInt("idPrestamo");
+                idEjemplar = resultset.getInt("idEjemplar");
+                ejemplar = getEjemplares("SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + idEjemplar + "';").get(0);
+                idLector = resultset.getInt("idLector");
+                lector = getLectores("SELECT * FROM lectores WHERE idLector = " + idLector + ";").get(0);
+                fechaPrestamo = resultset.getDate("fecha_prestamo").toLocalDate();
+                fechaDevolucion = resultset.getDate("fecha_devolucion").toLocalDate();
+                devuelto = resultset.getBoolean("devuelto");
+                prestamo = new Prestamo(idPrestamo, ejemplar, lector, fechaPrestamo, fechaDevolucion, devuelto);
+                prestamos.add(prestamo);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                closeResultset(resultset);
+                closeStatement(statement);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return prestamos;
+    }
     public static ArrayList<Lector> getLectores(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -13,42 +61,27 @@ public class DBHandler {
         Statement statement = null;
         ResultSet resultset = null;
         Lector lector;
-        Direccion direccion;
         int idLector;
         String nombre;
-        String apellido1;
-        String apellido2;
+        String apellidos;
         String numeroLector;
         String telefono;
         String email;
-        int idDireccion;
 
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
-            while (resultset.next()){
+            while (resultset.next()) {
                 idLector = resultset.getInt("idLector");
                 nombre = resultset.getString("nombre");
-                apellido1 = resultset.getString("apellido1");
+                apellidos = resultset.getString("apellidos");
                 numeroLector = resultset.getString("numero_lector");
                 telefono = resultset.getString("telefono");
                 email = resultset.getString("email");
-                idDireccion = resultset.getInt("idDireccion");
-                direccion = getDirecciones("SELECT * FROM direcciones WHERE idDireccion = " + idDireccion + ";").get(0);
-
-                if (resultset.getString("apellido2") != null) {
-                    apellido2 = resultset.getString("apellido2");
-                    if (resultset.getString("email") != null) {
-                        lector = new Lector(idLector, nombre, apellido1, apellido2, numeroLector, telefono, email, direccion);
-                    } else {
-                        lector = new Lector(idLector, nombre, apellido1, apellido2, numeroLector, telefono, direccion, 0);
-                    }
+                if (!resultset.wasNull()) {
+                    lector = new Lector(idLector, nombre, apellidos, numeroLector, telefono, email);
                 } else {
-                    if (resultset.getString("email") != null) {
-                        lector = new Lector(idLector, nombre, apellido1, numeroLector, telefono, email, direccion);
-                    } else {
-                        lector = new Lector(idLector, nombre, apellido1, numeroLector, telefono, direccion);
-                    }
+                    lector = new Lector(idLector, nombre, apellidos, numeroLector, telefono);
                 }
                 lectores.add(lector);
             }
@@ -65,46 +98,29 @@ public class DBHandler {
         }
         return lectores;
     }
-    public static ArrayList<Direccion> getDirecciones(String sql) {
+
+    public static ArrayList<Ejemplar> getEjemplares(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
-        ArrayList<Direccion> direcciones = new ArrayList<Direccion>();
+        ArrayList<Ejemplar> ejemplares = new ArrayList<Ejemplar>();
         Statement statement = null;
         ResultSet resultset = null;
-        Direccion direccion;
-        int idDireccion;
-        String tipoVia;
-        String nombreVia;
-        int numero;
-        int piso = 0;
-        char portal = ' ';
-        int codigoPostal;
-        String localidad;
-        String provincia;
+        Ejemplar ejemplar;
+        int idEjemplar;
+        String codigoEjemplar;
+        Libro libro;
+        int idLibro;
 
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
-            while (resultset.next()){
-                idDireccion = resultset.getInt("idDireccion");
-                tipoVia = resultset.getString("tipo_via");
-                nombreVia = resultset.getString("nombre_via");
-                numero = resultset.getInt("numero");
-                codigoPostal = resultset.getInt("codigo_postal");
-                localidad = resultset.getString("localidad");
-                provincia = resultset.getString("provincia");
-                piso = resultset.getInt("piso");
-                if (!resultset.wasNull()) {
-                    portal = resultset.getString("portal").charAt(0);
-                    if (!resultset.wasNull()) {
-                        direccion = new Direccion(idDireccion, tipoVia, nombreVia, numero, piso, portal, codigoPostal, localidad, provincia);
-                    } else {
-                        direccion = new Direccion(idDireccion, tipoVia, nombreVia, numero, piso, codigoPostal, localidad, provincia);
-                    }
-                } else {
-                    direccion = new Direccion(idDireccion,tipoVia, nombreVia, numero, codigoPostal, localidad, provincia);
-                }
-                direcciones.add(direccion);
+            while (resultset.next()) {
+                idEjemplar = resultset.getInt("idEjemplar");
+                codigoEjemplar = resultset.getString("codigo_ejemplar");
+                idLibro = resultset.getInt("idLibro");
+                libro = getLibros("SELECT * FROM autores WHERE idAutor = " + idLibro + ";").get(0);
+                ejemplar = new Ejemplar(idEjemplar,codigoEjemplar, libro);
+                ejemplares.add(ejemplar);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -117,7 +133,7 @@ public class DBHandler {
                 e.printStackTrace();
             }
         }
-        return direcciones;
+        return ejemplares;
     }
     public static ArrayList<Libro> getLibros(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
@@ -136,7 +152,7 @@ public class DBHandler {
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
-            while (resultset.next()){
+            while (resultset.next()) {
                 idLibro = resultset.getInt("idLibro");
                 titulo = resultset.getString("titulo");
                 idAutor = resultset.getInt("idAutor");
@@ -159,6 +175,7 @@ public class DBHandler {
         }
         return libros;
     }
+
     public static ArrayList<Autor> getAutores(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -168,22 +185,16 @@ public class DBHandler {
         Autor autor;
         int idAutor;
         String nombre;
-        String apellido1;
-        String apellido2;
+        String apellidos;
 
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
-            while (resultset.next()){
+            while (resultset.next()) {
                 idAutor = resultset.getInt("idAutor");
                 nombre = resultset.getString("nombre");
-                apellido1 = resultset.getString("apellido1");
-                if (resultset.getString("apellido2") != null) {
-                    apellido2 = resultset.getString("apellido2");
-                    autor = new Autor(idAutor, nombre, apellido1, apellido2);
-                } else {
-                    autor = new Autor(idAutor, nombre, apellido1);
-                }
+                apellidos = resultset.getString("apellidos");
+                autor = new Autor(idAutor, nombre, apellidos);
                 autores.add(autor);
             }
         } catch (SQLException e) {
@@ -199,6 +210,7 @@ public class DBHandler {
         }
         return autores;
     }
+
     public static int getInt(String sql, String columnName) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -209,7 +221,7 @@ public class DBHandler {
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
-            if (resultset.next()){
+            if (resultset.next()) {
                 result = resultset.getInt(columnName);
             }
         } catch (SQLException e) {
@@ -225,6 +237,7 @@ public class DBHandler {
         }
         return result;
     }
+
     public static int getInt(String sql, int columnIndex) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -235,7 +248,7 @@ public class DBHandler {
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
-            if (resultset.next()){
+            if (resultset.next()) {
                 result = resultset.getInt(columnIndex);
             }
         } catch (SQLException e) {
@@ -251,6 +264,7 @@ public class DBHandler {
         }
         return result;
     }
+
     public static String getString(String sql, String columnName) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -261,7 +275,7 @@ public class DBHandler {
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
-            if (resultset.next()){
+            if (resultset.next()) {
                 result = resultset.getString(columnName);
             }
         } catch (SQLException e) {
@@ -277,6 +291,7 @@ public class DBHandler {
         }
         return result;
     }
+
     public static String getString(String sql, int columnIndex) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -287,7 +302,7 @@ public class DBHandler {
         try {
             statement = connection.createStatement();
             resultset = statement.executeQuery(sql);
-            if (resultset.next()){
+            if (resultset.next()) {
                 result = resultset.getString(columnIndex);
             }
         } catch (SQLException e) {
@@ -303,6 +318,7 @@ public class DBHandler {
         }
         return result;
     }
+
     public static boolean hayRegistros(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -328,6 +344,7 @@ public class DBHandler {
         }
         return hayRegistros;
     }
+
     public static void executeUpdate(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -337,7 +354,7 @@ public class DBHandler {
         try {
             statement = connection.createStatement();
             result = statement.executeUpdate(sql);
-            if(result >= 1) {
+            if (result >= 1) {
                 System.out.println(Utils.obtenerMensajeExecuteUpdate(sql));
             }
         } catch (SQLException e) {
@@ -351,6 +368,7 @@ public class DBHandler {
             }
         }
     }
+
     public static void closeStatement(Statement statement) {
         try {
             if (statement != null) {
@@ -360,6 +378,7 @@ public class DBHandler {
             e.printStackTrace();
         }
     }
+
     public static void closeResultset(ResultSet resultset) {
         try {
             if (resultset != null) {

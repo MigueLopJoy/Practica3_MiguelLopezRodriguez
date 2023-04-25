@@ -1,8 +1,10 @@
 package User;
 
 import Biblioteca.Lector;
+import Biblioteca.Prestamo;
 import Gestion.Catalogo;
 import Gestion.Lectores;
+import Gestion.Prestamos;
 
 public class Menus {
     public static void mainMenu() {
@@ -23,7 +25,7 @@ public class Menus {
                     break;
                 }
                 case 3: {
-                    System.out.println("Sin implementar");
+                    menuPrestamos();
                     break;
                 }
                 case 4: {
@@ -167,15 +169,16 @@ public class Menus {
                     break;
                 }
                 case 2: {
-                    System.out.println("Sin implementar");
+                    Lectores.registrarLector();
                     break;
                 }
                 case 3: {
-                    menuActualizarLectores();
+                    Lectores.actualizarLector();
                     break;
                 }
                 case 4: {
                     Lectores.eliminar();
+                    break;
                 }
                 case 5: {
                     salir = true;
@@ -200,7 +203,7 @@ public class Menus {
                 case 2: {
                     do {
                         option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
-                                + " \n 1 - Buscar por datos personales;" + "\n 2 - Introducir numero de lector;" + "\n 3 - Salir;");
+                                + " \n 1 - Buscar por nombre;" + "\n 2 - Buscar por nº de lector;" + "\n 3 - Salir;");
                         switch (option) {
                             case 1: {
                                 Lectores.consultarLectores(2);
@@ -227,19 +230,59 @@ public class Menus {
         } while (!salir);
     }
 
-    private static void menuActualizarLectores() {
+    public static void menuPrestamos() {
         int option;
         boolean salir = false;
+
         do {
             option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
-                    + " \n 1 - Modificar los datos de un lector;" + "\n 2 - Modificar la dirección de un lector;" + "\n 3 - Salir;");
+                    + " \n 1 - Prestamos y devoluciones;" + "\n 2 - Consultar prestamos;"
+                    + "\n 3 - Salir;");
             switch (option) {
                 case 1: {
-                    Lectores.actualizar(1);
+                    option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
+                            + " \n 1 - Prestar ejemplar;" + "\n 2 - Devolver ejemplar;" + "\n 3 - Salir;");
+                    switch (option) {
+                        case 1: {
+                            Prestamos.prestar();
+                            break;
+                        }
+                        case 2: {
+                            Prestamos.devolver();
+                            break;
+                        }
+                        case 3: {
+                            salir = true;
+                            break;
+                        }
+                    }
                     break;
                 }
                 case 2: {
-                    Lectores.actualizar(2);
+                    do {
+                        option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
+                                + " \n 1 - Consultar todos los prestamos;" + "\n 2 - Buscar por codigo de ejemplar;"
+                                + "\n 3 - Buscar por numero de lector;" + "\n 4 - Salir;");
+                        switch (option) {
+                            case 1: {
+                                Prestamos.consultarPrestamos(1);
+                                break;
+                            }
+                            case 2: {
+                                Prestamos.consultarPrestamos(2);
+                                break;
+                            }
+                            case 3: {
+                                Prestamos.consultarPrestamos(3);
+                                break;
+                            }
+                            case 4: {
+                                salir = true;
+                                break;
+                            }
+                        }
+                    } while (!salir);
+                    salir = false;
                     break;
                 }
                 case 3: {

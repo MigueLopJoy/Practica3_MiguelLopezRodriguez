@@ -10,14 +10,31 @@ public class pedirDatos {
 		año = Year.of(pedirInt(texto, 1500, 2022));
 		return año;
 	}
+
+	public static String pedirCodigo(String texto) {
+		String codigo;
+		do {
+			codigo = pedirDatos.pedirString(texto);
+			codigo = codigo.trim();
+		} while (!Utils.validarCodigo(codigo));
+		return codigo;
+	}
 	public static String pedirNombre(String texto) {
 		String nombre;
 		do {
 			nombre = pedirDatos.pedirString(texto);
-			nombre = nombre.trim();
+			nombre = Utils.convertirPrimeraMayuscula(nombre);
 		} while (!Utils.validarNombre(nombre));
-		nombre = Utils.convertirMayuscula(nombre);
 		return nombre;
+	}
+
+	public static String pedirCorreo(String texto) {
+		String correo;
+		do {
+			correo = pedirDatos.pedirString(texto);
+			correo = Utils.convertirMinusculas(correo);
+		} while (!Utils.validarCorreo(correo));
+		return correo;
 	}
 
 	public static String pedirString(String texto) {
