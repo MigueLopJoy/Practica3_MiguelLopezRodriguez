@@ -240,22 +240,25 @@ public class Menus {
                     + "\n 3 - Salir;");
             switch (option) {
                 case 1: {
-                    option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
-                            + " \n 1 - Prestar ejemplar;" + "\n 2 - Devolver ejemplar;" + "\n 3 - Salir;");
-                    switch (option) {
-                        case 1: {
-                            Prestamos.prestar();
-                            break;
+                    do {
+                        option = pedirDatos.pedirInt("Escoja la accion que desea realizar:"
+                                + " \n 1 - Prestar ejemplar;" + "\n 2 - Devolver ejemplar;" + "\n 3 - Salir;");
+                        switch (option) {
+                            case 1: {
+                                Prestamos.prestar();
+                                break;
+                            }
+                            case 2: {
+                                Prestamos.devolver();
+                                break;
+                            }
+                            case 3: {
+                                salir = true;
+                                break;
+                            }
                         }
-                        case 2: {
-                            Prestamos.devolver();
-                            break;
-                        }
-                        case 3: {
-                            salir = true;
-                            break;
-                        }
-                    }
+                    } while(!salir);
+                    salir = false;
                     break;
                 }
                 case 2: {

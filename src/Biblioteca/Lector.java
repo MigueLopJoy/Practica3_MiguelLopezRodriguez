@@ -140,7 +140,13 @@ public class Lector extends Persona implements ElementoBiblioteca {
 
     @Override
     public String toString() {
-        return super.toString() + " - Nº lector: " + this.numeroLector;
+        String toString;
+        if (email != null) {
+            toString = super.toString() + " - Nº lector: " + this.numeroLector + " - Contacto: " + telefono + ", " + email;
+        } else {
+            toString =  super.toString() + " - Nº lector: " + this.numeroLector + " - Contacto: " + telefono;
+        }
+        return toString;
     }
 
     private String generarNumeroLector() {

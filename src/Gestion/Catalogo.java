@@ -213,10 +213,16 @@ public class Catalogo {
     public static Ejemplar escogerEjemplar(String sql) {
         Ejemplar ejemplar = null;
         String codigoEjemplar;
+        String escogerEjemplarSQL;
 
         if (DBHandler.hayRegistros(sql)) {
             codigoEjemplar = pedirDatos.pedirCodigo("Introduzca el codigo del ejemplar");
-            ejemplar = DBHandler.getEjemplares("SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + codigoEjemplar + "';").get(0);
+            escogerEjemplarSQL = "SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + codigoEjemplar + "';";
+            if (DBHandler.hayRegistros(escogerEjemplarSQL)) {
+                ejemplar = DBHandler.getEjemplar(escogerEjemplarSQL);
+            } else {
+                System.out.println("No se encontro el ejemplar buscado");
+            }
         } else {
             System.out.println("No se encontraron ejemplares registrados");
         }

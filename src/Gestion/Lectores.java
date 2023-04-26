@@ -19,10 +19,6 @@ public class Lectores {
 
     private static ArrayList<Lector> buscar(int option) {
         ArrayList<Lector> lectores = new ArrayList<Lector>();
-        Lector lector;
-        String sql;
-        String nombre;
-        String apellidos;
 
         switch (option) {
             case 1: {
@@ -30,16 +26,11 @@ public class Lectores {
                 break;
             }
             case 2: {
-                nombre = pedirDatos.pedirString(" - Intorduzca el nombre del lector");
-                apellidos = pedirDatos.pedirString(" - Intorduzca los apellidos del lector");
-
-                sql = "SELECT * FROM lectores WHERE nombre = '" + nombre + "' AND apellidos = '" + apellidos + "';";
-                lectores = DBHandler.getLectores(sql);
+                lectores = escogerLectorNombre("SELECT * FROM lectores;");
                 break;
             }
             case 3: {
-                lector = escogerLector("SELECT * FROM lectores");
-                lectores.add(lector);
+                lectores.add(escogerLectorNumero("SELECT * FROM lectores;"));
                 break;
             }
         }
@@ -56,7 +47,7 @@ public class Lectores {
         String sql;
 
         if (DBHandler.hayRegistros("SELECT * FROM lectores")) {
-            lector = escogerLector("SELECT * FROM lectores");
+            lector = escogerLectorNumero("SELECT * FROM lectores");
             System.out.println("Nuevos datos del lector:");
             nuevosDatos = crearLector(lector.getIdLector());
             nuevosDatos.setIdLector(lector.getIdLector());
@@ -68,7 +59,7 @@ public class Lectores {
     }
 
     public static void eliminar() {
-        eliminarLector(escogerLector("SELECT * FROM lectores"));
+        eliminarLector(escogerLectorNumero("SELECT * FROM lectores"));
     }
 
     private static void eliminarLector(Lector lector) {
@@ -93,13 +84,35 @@ public class Lectores {
         return prestamosVinuclados;
     }
 
-    public static Lector escogerLector(String sql) {
+    private static ArrayList<Lector> escogerLectorNombre(String sql) {
+        ArrayList<Lector> lectores = new ArrayList<Lector>();
+        String nombre;
+        String apellidos;
+        String getLectorSQL;
+
+        if (DBHandler.hayRegistros(sql)) {
+            nombre = pedirDatos.pedirString(" - Intorduzca el nombre del lector");
+            apellidos = pedirDatos.pedirString(" - Intorduzca los apellidos del lector");
+
+            getLectorSQL = "SELECT * FROM lectores WHERE nombre = '" + nombre + "' AND apellidos = '" + apellidos + "';";
+
+            lectores = DBHandler.getLectores(getLectorSQL);
+        }
+        return lectores;
+    }
+    public static Lector escogerLectorNumero(String sql) {
         Lector lector = null;
         String numLector;
+        String getLectorSQL;
 
         if (DBHandler.hayRegistros(sql)) {
             numLector = pedirDatos.pedirCodigo("Introduzca el numero de lector");
-            lector = DBHandler.getLectores("SELECT * FROM lectores WHERE numero_lector = '" + numLector + "';").get(0);
+            getLectorSQL = "SELECT * FROM lectores WHERE numero_lector = '" + numLector + "';";
+            if (DBHandler.hayRegistros(sql)) {
+                lector = DBHandler.getLector(getLectorSQL);
+            } else {
+                System.out.println("No se encontro el lector buscado");
+            }
         } else {
             System.out.println("No se encontraron registros de lectores");
         }
@@ -116,6 +129,11 @@ public class Lectores {
             System.out.println(mensaje);
         }
     }
+
+    /**
+     * Permite crear un lector pidiendo todos sus datos al usuario bibliotecario
+     * @return Lector creado a partir de los datos introducidos por consola
+     */
     private static Lector crearLector() {
         Lector lector = null;
         String nombre;
@@ -147,8 +165,13 @@ public class Lectores {
         return lector;
     }
 
+    /**
+     * Permite modificar los datos de un lector ya existente en la base de datos
+     * @param idLector id vinculado en la bdd al lector cuyos datos quieren ser modificados
+     * @return objeto lector con los nuevos datos del lector modificados
+     */
     private static Lector crearLector(int idLector) {
-        Lector lector = null;
+        Lector lector;
         String nombre;
         String apellidos;
         String telefono;
@@ -169,6 +192,11 @@ public class Lectores {
                     System.out.println("Email asociado a otro lector");
                 }
             } while(isEmailRepetido(email, idLector));
+        } else {
+            // Compruebo si anteriormente habia un correo asociado al lector y lo elimina
+            if (DBHandler.hayRegistros("SELECT email FROM lectores WHERE idLector = " + idLector + ";")){
+                DBHandler.executeUpdate("UPDATE lectores SET email = null WHERE idLector = " + idLector + ";");
+            }
         }
         if (email != "") {
             lector = new Lector(nombre, apellidos, telefono, email);
@@ -177,6 +205,12 @@ public class Lectores {
         }
         return lector;
     }
+
+    /**
+     * Recibe una direccion de correo por parametro e indica si existe o no en la base de datos
+     * @param email email que quiere comprobarse si existe en la bdd
+     * @return booleano que indica si el email pasado por parametro ya existe en la bdd
+     */
     private static boolean isEmailRepetido(String email) {
         boolean repetido = false;
 
@@ -186,29 +220,46 @@ public class Lectores {
         return repetido;
     }
 
+    /**
+     * Recibe una direccion de correo por parametro e indica si existe o no en la bdd, exluyendo la posibilidad de que exista asociada al lector vinculado al id pasado por parametro
+     * @param email email que quiere comprobarse si existe en la bdd
+     * @param idLector id del lector al cual si puede estar asociada la direcciond de correo pasada por parametro
+     * @return booleano que indica si el email pasado por parametro ya existe en la bdd, exluyendo la posibilidad de que exista asociada al lector vinculado al id señalado
+     */
     private static boolean isEmailRepetido(String email, int idLector) {
         boolean repetido = false;
 
-        if(DBHandler.hayRegistros("SELECT * FROM lectores WHERE email = '" + email +  " AND idLector != " + idLector + "';")) {
+        if(DBHandler.hayRegistros("SELECT * FROM lectores WHERE email = '" + email +  "' AND idLector != " + idLector + ";")) {
             repetido = true;
         }
         return repetido;
     }
 
+    /**
+     * Recibe un numero de telefono por parametro e indica si existe o no en la base de datos
+     * @param numeroTelefono numero de telefono que quiere comprobarse si existe en la bdd
+     * @return booleano que indica si el numero de telefono pasado por parametro ya existe en la bdd
+     */
     private static boolean isTelefonoRepetido(String numeroTelefono) {
         boolean repetido = false;
 
-        String sql = "SELECT * FROM lectores WHERE numero_telefono = '" + numeroTelefono + "' AND " + "';";
+        String sql = "SELECT * FROM lectores WHERE numero_telefono = '" + numeroTelefono + "';";
         if(DBHandler.hayRegistros(sql)) {
             repetido = true;
         }
         return repetido;
     }
 
+    /**
+     * Recibe un numero de telefono por parametro e indica si existe o no en la bdd, exluyendo la posibilidad de que exista asociado al lector vinculado al id pasado por parametro
+     * @param numeroTelefono numero de telefono que quiere comprobarse si existe en la bdd
+     * @param idLector id del lector al cual si puede estar asociada el numero de telefono pasado por parametro
+     * @return booleano que indica si el numero de telefono pasado por parametro ya existe en la bdd, exluyendo la posibilidad de que exista asociada al lector vinculado al id señalado
+     */
     private static boolean isTelefonoRepetido(String numeroTelefono, int idLector) {
         boolean repetido = false;
 
-        String sql = "SELECT * FROM lectores WHERE numero_telefono = '" + numeroTelefono + "' AND idLector != " + idLector + "';";
+        String sql = "SELECT * FROM lectores WHERE numero_telefono = '" + numeroTelefono + "' AND idLector != " + idLector + ";";
         if(DBHandler.hayRegistros(sql)) {
             repetido = true;
         }

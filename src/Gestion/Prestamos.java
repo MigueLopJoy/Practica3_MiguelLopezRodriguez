@@ -2,60 +2,81 @@ package Gestion;
 
 import Biblioteca.*;
 import DBManagement.DBHandler;
-import User.pedirDatos;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class Prestamos {
 
+    /**
+     * Permite efectuar el prestamo de un ejemplar a un lector
+     */
     public static void prestar() {
-        Prestamo prestamo;
         Ejemplar ejemplar;
         Lector lector;
 
+        // Selecciona el ejemplar a prestar
         ejemplar = Catalogo.escogerEjemplar("SELECT * FROM ejemplares");
-        lector = Lectores.escogerLector("SELECT * FROM lectores");
-
-        if (ejemplar != null && lector != null) {
-            if (DBHandler.hayRegistros(ejemplar.getSelectString())) {
-                if (DBHandler.hayRegistros(lector.getSelectString())) {
-                    if (!isPrestado(ejemplar)) {
-                        prestamo = new Prestamo(ejemplar, lector);
-                        DBHandler.executeUpdate(prestamo.getInsertString());
-                        System.out.println("Prestamo efectuado con exito");
-                    } else {
-                        System.out.println("El ejemplar ya esta prestado");
-                    }
+        // Comprueba que el ejemplar escogido existe
+        if (ejemplar != null) {
+            lector = Lectores.escogerLectorNumero("SELECT * FROM lectores");
+            // Comprueba que el lector escogido existe
+            if (lector != null) {
+                // Comprueba que el ejemplar no esta prestado y efectua el prestamo al lector
+                if (!isPrestado(ejemplar)) {
+                    efectuarPrestamo(lector, ejemplar);
                 } else {
-                    System.out.println("No se encontro el lector");
+                    System.out.println("El ejemplar ya esta prestado");
                 }
-            } else {
-                System.out.println("No se encontro el ejemplar");
             }
         }
     }
 
+    /**
+     * Lleva a efecto el prestamo del ejemplar indicado al lector que se especifica
+     *
+     * @param lector   Lector que recibira el prestamo
+     * @param ejemplar Ejemplar que sera prestado
+     */
+    public static void efectuarPrestamo(Lector lector, Ejemplar ejemplar) {
+        Prestamo prestamo;
+
+        prestamo = new Prestamo(ejemplar, lector);
+        DBHandler.executeUpdate(prestamo.getInsertString());
+        System.out.println("Prestamo efectuado con exito");
+    }
+
+    /**
+     * Permite efectuar la devolucion de ejempares prestados y sin devolver si los hubiere
+     */
     public static void devolver() {
         Prestamo prestamo;
         Ejemplar ejemplar;
 
-        ejemplar = Catalogo.escogerEjemplar("SELECT * FROM ejemplares");
-
-        if (ejemplar != null) {
-            if (DBHandler.hayRegistros(ejemplar.getSelectString())) {
+        // Comprueba que hay ejemplares prestados sin devolver
+        if (hayPrestamosViguentes()) {
+            // Escoger ejemplar a devolver
+            ejemplar = Catalogo.escogerEjemplar("SELECT * FROM ejemplares");
+            // Comprueba que el ejemplar buscado existe
+            if (ejemplar != null) {
+                // Comrpueba si el ejemplar esta prestado y lo devuelve
                 if (isPrestado(ejemplar)) {
-                    prestamo = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE idEjemplar = " + ejemplar.getIdEjemplar() + ";").get(0);
-                    DBHandler.executeUpdate(prestamo.getUpdateString());
-                    System.out.println("Ejemplar devuelto con exito");
+                    efectuarDevolucion(ejemplar);
                 } else {
                     System.out.println("El ejemplar no esta prestado");
                 }
-            } else {
-                System.out.println("No se encontro el ejemplar");
             }
         }
     }
+
+    private static void efectuarDevolucion(Ejemplar ejemplar) {
+        Prestamo prestamo;
+
+        prestamo = DBHandler.getPrestamo("SELECT * FROM prestamos WHERE idEjemplar = " + ejemplar.getIdEjemplar() + ";");
+        DBHandler.executeUpdate(prestamo.getUpdateString());
+        System.out.println("Ejemplar devuelto con exito");
+    }
+
 
     public static void consultarPrestamos(int option) {
         if (DBHandler.hayRegistros("SELECT * FROM prestamos;")) {
@@ -69,15 +90,18 @@ public class Prestamos {
 
     private static ArrayList<Prestamo> buscar(int option) {
         ArrayList<Prestamo> prestamos = new ArrayList<Prestamo>();
-
+        Prestamo prestamo;
 
         switch (option) {
             case 1: {
-                prestamos = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE devuelto = 'false';");
+                prestamos = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE devuelto = 0;");
                 break;
             }
             case 2: {
-                prestamos.add(escogerPrestamosEjemplar());
+                prestamo = escogerPrestamoEjemplar();
+                if (prestamo != null) {
+                    prestamos.add(escogerPrestamoEjemplar());
+                }
                 break;
             }
             case 3: {
@@ -88,42 +112,46 @@ public class Prestamos {
         return prestamos;
     }
 
-    public static Prestamo escogerPrestamosEjemplar() {
-        Prestamo prestamo;
+    public static Prestamo escogerPrestamoEjemplar() {
+        Prestamo prestamo = null;
         Ejemplar ejemplar;
         String sql;
 
-        if (DBHandler.hayRegistros("SELECT * FROM prestamos")) {
+        if (hayPrestamosViguentes()) {
             sql = "SELECT * FROM ejemplares e INNER JOIN prestamos p " +
-                    "ON e.idEjemplar = p.idEjemplar WHERE p.devuelto = 'false';";
+                    "ON e.idEjemplar = p.idEjemplar WHERE p.devuelto = 0;";
             ejemplar = Catalogo.escogerEjemplar(sql);
-            prestamo = new Prestamo(ejemplar);
-        } else {
-            System.out.println("No hay prestamos vigentes");
-            prestamo = new Prestamo();
+            if (ejemplar != null) {
+                prestamo = new Prestamo(ejemplar);
+            }
         }
-
         return prestamo;
     }
 
     public static ArrayList<Prestamo> escogerPrestamosLector() {
         ArrayList<Prestamo> prestamosLector = new ArrayList<Prestamo>();
-        Prestamo prestamo;
+        Prestamo prestamo = null;
         Lector lector;
         String sql;
 
-        if (DBHandler.hayRegistros("SELECT * FROM prestamos")) {
+        if (hayPrestamosViguentes()) {
             sql = "SELECT * FROM lectores l INNER JOIN prestamos p ON l.idLector = p.idEjemplar " +
-                    "WHERE devuelto = 'false';";
-            lector = Lectores.escogerLector(sql);
-            prestamosLector = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE idLector = " + lector.getIdLector() + ";");
+                    "WHERE devuelto = 0;";
+            lector = Lectores.escogerLectorNumero(sql);
+            if (lector != null) {
+                prestamosLector = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE idLector = " + lector.getIdLector() + ";");
+            }
         } else {
-            System.out.println("No hay prestamos vigentes");
-            prestamo = new Prestamo();
             prestamosLector.add(prestamo);
         }
         return prestamosLector;
     }
+
+    /**
+     * Imprime por consola un listado de prestamos pasados por parametro
+     *
+     * @param prestamos prestamos que quieren ser imprimidos por consola
+     */
     private static void mostrarPrestamos(ArrayList<Prestamo> prestamos) {
         Prestamo prestamo;
         String mensaje;
@@ -137,12 +165,32 @@ public class Prestamos {
         }
     }
 
+    /**
+     * Comprueba si hay registros de libros prestados sin devolver. Si no los hay, lo indica por consola.
+     *
+     * @return booleano que indica si hay libros prestados sin devovler
+     */
+    public static boolean hayPrestamosViguentes() {
+        boolean hayPrestamosVigentes = false;
+        if (DBHandler.hayRegistros("SELECT * FROM prestamos WHERE devuelto = 0;")) {
+            hayPrestamosVigentes = true;
+        } else {
+            System.out.println("No hay prestamos vigentes");
+        }
+        return hayPrestamosVigentes;
+    }
+
+    /**
+     * Comrpueba si hay registros de un ejemplar prestado y sin devolver
+     *
+     * @param ejemplar ejemplar que quiere comprobarse si esta prestado
+     * @return booleano que indica si el ejemplar pasado por parametro esta prestado y sin devolver
+     */
     public static boolean isPrestado(Ejemplar ejemplar) {
         boolean prestado = false;
-        if (DBHandler.hayRegistros("SELECT * FROM prestamos WHERE idEjemplar = " + ejemplar.getIdEjemplar() + ";")) {
+        if (DBHandler.hayRegistros("SELECT * FROM prestamos WHERE idEjemplar = " + ejemplar.getIdEjemplar() + " AND devuelto = 0;")) {
             prestado = true;
         }
         return prestado;
     }
-
 }

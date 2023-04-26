@@ -12,8 +12,7 @@ public class Prestamo implements Comparable<Prestamo>, ElementoBiblioteca{
     Lector lector;
     LocalDate fechaPrestamo;
     LocalDate fechaDevolucion;
-
-    Boolean devuelto;
+    int devuelto;
 
     public Prestamo() {
         super();
@@ -32,10 +31,10 @@ public class Prestamo implements Comparable<Prestamo>, ElementoBiblioteca{
         this.lector = lector;
         this.fechaPrestamo = LocalDate.now();
         this.fechaDevolucion = fechaPrestamo.plusDays(15);
-        this.devuelto = false;
+        this.devuelto = 0;
     }
 
-    public Prestamo(int idPrestamo, Ejemplar ejemplar, Lector lector, LocalDate fechaPrestamo, LocalDate fechaDevolucion, Boolean devuelto) {
+    public Prestamo(int idPrestamo, Ejemplar ejemplar, Lector lector, LocalDate fechaPrestamo, LocalDate fechaDevolucion, int devuelto) {
         this.idPrestamo = idPrestamo;
         this.ejemplar = ejemplar;
         this.lector = lector;
@@ -86,8 +85,8 @@ public class Prestamo implements Comparable<Prestamo>, ElementoBiblioteca{
 
     @Override
     public String getInsertString() {
-        return "INSERT INTO prestamos (idEjemplar, idLector, fecha_prestamo, fecha_devolucion) " +
-                "VALUES ("+ ejemplar.getIdEjemplar() + ", " + lector.getIdLector() + ", '" + fechaPrestamo + "', '"
+        return "INSERT INTO prestamos (idEjemplar, idLector, fecha_prestamo, fecha_devolucion, devuelto) " +
+                "VALUES (" + ejemplar.getIdEjemplar() + ", " + lector.getIdLector() + ", '" + fechaPrestamo + "', '"
                 + fechaDevolucion + "', '" + devuelto + "');";
     }
 
