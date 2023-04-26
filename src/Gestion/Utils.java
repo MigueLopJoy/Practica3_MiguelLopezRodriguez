@@ -64,24 +64,26 @@ public class Utils {
         String elementoInsertado = "";
         String mensaje = "";
 
-        if (sql.indexOf("INSERT") != -1) {
-            operacion = "insertado";
-        } else if (sql.indexOf("UPDATE") != -1) {
-            operacion = "actualizado";
-        } else if (sql.indexOf("DELETE") != -1) {
-            operacion = "eliminado";
-        }
+        if (sql.indexOf("prestamos") == -1) {
+            if (sql.indexOf("INSERT") != -1) {
+                operacion = "insertado";
+            } else if (sql.indexOf("UPDATE") != -1) {
+                operacion = "actualizado";
+            } else if (sql.indexOf("DELETE") != -1) {
+                operacion = "eliminado";
+            }
 
-        if (sql.indexOf("autores") != -1) {
-            elementoInsertado = "autor";
-        } else if (sql.indexOf("catalogo") != -1) {
-            elementoInsertado = "libro";
-        } else if (sql.indexOf("ejemplares") != -1) {
-            elementoInsertado = "ejemplar";
-        } else if (sql.indexOf("lectores") != -1) {
-            elementoInsertado = "lector";
+            if (sql.indexOf("autores") != -1) {
+                elementoInsertado = "autor";
+            } else if (sql.indexOf("catalogo") != -1) {
+                elementoInsertado = "libro";
+            } else if (sql.indexOf("ejemplares") != -1) {
+                elementoInsertado = "ejemplar";
+            } else if (sql.indexOf("lectores") != -1) {
+                elementoInsertado = "lector";
+            }
+            mensaje = elementoInsertado + " " + operacion + " con exito";
         }
-        mensaje = elementoInsertado + " " + operacion + " con exito";
         return mensaje;
     }
 }

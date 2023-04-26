@@ -19,15 +19,15 @@ public class Prestamos {
         ejemplar = Catalogo.escogerEjemplar("SELECT * FROM ejemplares");
         // Comprueba que el ejemplar escogido existe
         if (ejemplar != null) {
-            lector = Lectores.escogerLectorNumero("SELECT * FROM lectores");
-            // Comprueba que el lector escogido existe
-            if (lector != null) {
-                // Comprueba que el ejemplar no esta prestado y efectua el prestamo al lector
-                if (!isPrestado(ejemplar)) {
+            if (!isPrestado(ejemplar)) {
+                lector = Lectores.escogerLectorNumero("SELECT * FROM lectores");
+                // Comprueba que el lector escogido existe
+                if (lector != null) {
+                    // Comprueba que el ejemplar no esta prestado y efectua el prestamo al lector
                     efectuarPrestamo(lector, ejemplar);
-                } else {
-                    System.out.println("El ejemplar ya esta prestado");
                 }
+            } else {
+                System.out.println("El ejemplar ya esta prestado");
             }
         }
     }
@@ -54,7 +54,7 @@ public class Prestamos {
         Ejemplar ejemplar;
 
         // Comprueba que hay ejemplares prestados sin devolver
-        if (hayPrestamosViguentes()) {
+        if (hayPrestamosVigentes()) {
             // Escoger ejemplar a devolver
             ejemplar = Catalogo.escogerEjemplar("SELECT * FROM ejemplares");
             // Comprueba que el ejemplar buscado existe
@@ -69,6 +69,11 @@ public class Prestamos {
         }
     }
 
+    /**
+     * Lleva a efecto la devolucion del ejemplar pasado por parametro
+     *
+     * @param ejemplar Ejemplar que sera devuelto
+     */
     private static void efectuarDevolucion(Ejemplar ejemplar) {
         Prestamo prestamo;
 
@@ -78,68 +83,93 @@ public class Prestamos {
     }
 
 
+    /**
+     * Recupera una lista de prestamos mediante una llamada al metodo encargado de realizar una busqueda en funcion
+     * de una opcion de busqueda indicada por parametro y hace una llamada al metodo encargado de mostrar esta lista
+     * de prestamos por consola
+     *
+     * @param option opcion de busqueda escogida por el usuario y que sera enviada al metodo encargado de realizar la busqueda de prestamos
+     */
     public static void consultarPrestamos(int option) {
-        if (DBHandler.hayRegistros("SELECT * FROM prestamos;")) {
+        if (hayPrestamosVigentes()) {
             ArrayList<Prestamo> prestamos = buscar(option);
-            System.out.println("Prestamos en vigor: " + prestamos.size());
-            mostrarPrestamos(prestamos);
-        } else {
-            System.out.println("No se han encontrado prestamos");
+            if (prestamos.size() > 0) {
+                System.out.println("Prestamos en vigor: " + prestamos.size());
+                mostrarPrestamos(prestamos);
+            }
         }
     }
 
+    /**
+     * Devuelve una lista con el/ los prestamos recuperados de una busqueda efectuada en base a una opcion de busqueda escogida por el usuario
+     * @param option opcion de busqueda previamente escogida por el suaurio
+     * @return Lista de prestamos recuperada de la busqueda del usuario
+     */
     private static ArrayList<Prestamo> buscar(int option) {
         ArrayList<Prestamo> prestamos = new ArrayList<Prestamo>();
         Prestamo prestamo;
+        Lector lector;
+        Ejemplar ejemplar;
+        String sql;
 
         switch (option) {
             case 1: {
-                prestamos = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE devuelto = 0;");
+                // Recupera todos los prestamos de libros no devueltos
+                sql = "SELECT * FROM prestamos WHERE devuelto = 0;";
+                prestamos = DBHandler.getPrestamos(sql);
                 break;
             }
             case 2: {
-                prestamo = escogerPrestamoEjemplar();
+                // Recupera el unico prestamo que puede estar asociado a un ejemplar
+                sql = "SELECT * FROM ejemplares e INNER JOIN prestamos p ON e.idEjemplar = p.idEjemplar WHERE p.devuelto = 0;";
+                ejemplar = Catalogo.escogerEjemplar(sql);
+                prestamo = escogerPrestamoEjemplar(ejemplar);
                 if (prestamo != null) {
-                    prestamos.add(escogerPrestamoEjemplar());
+                    prestamos.add(prestamo);
                 }
                 break;
             }
             case 3: {
-                prestamos = escogerPrestamosLector();
+                // Recupera todos los prestamos que pueden estar asociados a un lector
+                sql = "SELECT * FROM lectores l INNER JOIN prestamos p ON l.idLector = p.idLector WHERE devuelto = 0;";
+                lector = Lectores.escogerLectorNumero(sql);
+                prestamos = escogerPrestamosLector(lector);
                 break;
             }
         }
         return prestamos;
     }
 
-    public static Prestamo escogerPrestamoEjemplar() {
+    /**
+     * Recupera los prestamos asociados al ejemplar pasado por parametro si lo hubiere
+     * @param ejemplar ejemplar del cual se quieren recuperar los prestamos asociados
+     * @return prestamo asocaido al ejemplar pasado por parametro
+     */
+    public static Prestamo escogerPrestamoEjemplar(Ejemplar ejemplar) {
         Prestamo prestamo = null;
-        Ejemplar ejemplar;
         String sql;
 
-        if (hayPrestamosViguentes()) {
-            sql = "SELECT * FROM ejemplares e INNER JOIN prestamos p " +
-                    "ON e.idEjemplar = p.idEjemplar WHERE p.devuelto = 0;";
-            ejemplar = Catalogo.escogerEjemplar(sql);
+        if (hayPrestamosVigentes()) {
             if (ejemplar != null) {
-                prestamo = new Prestamo(ejemplar);
+                prestamo = DBHandler.getPrestamo("SELECT * FROM prestamos WHERE idEjemplar = " + ejemplar.getIdEjemplar());
             }
         }
         return prestamo;
     }
 
-    public static ArrayList<Prestamo> escogerPrestamosLector() {
+    /**
+     * Recupera el conjunto de prestamos que puede haber asociado a un lector indicado por parametro
+     * @param lector lector del cual se quiere recuperar el conjunto de prestamos a el asociados, si lo hubiere
+     * @return conjunto de prestamos asociados al lector
+     */
+    public static ArrayList<Prestamo> escogerPrestamosLector(Lector lector) {
         ArrayList<Prestamo> prestamosLector = new ArrayList<Prestamo>();
         Prestamo prestamo = null;
-        Lector lector;
         String sql;
 
-        if (hayPrestamosViguentes()) {
-            sql = "SELECT * FROM lectores l INNER JOIN prestamos p ON l.idLector = p.idEjemplar " +
-                    "WHERE devuelto = 0;";
-            lector = Lectores.escogerLectorNumero(sql);
+        if (hayPrestamosVigentes()) {
             if (lector != null) {
-                prestamosLector = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE idLector = " + lector.getIdLector() + ";");
+                prestamosLector = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE idLector = " + lector.getIdLector() + " AND devuelto = 0;");
             }
         } else {
             prestamosLector.add(prestamo);
@@ -170,7 +200,7 @@ public class Prestamos {
      *
      * @return booleano que indica si hay libros prestados sin devovler
      */
-    public static boolean hayPrestamosViguentes() {
+    public static boolean hayPrestamosVigentes() {
         boolean hayPrestamosVigentes = false;
         if (DBHandler.hayRegistros("SELECT * FROM prestamos WHERE devuelto = 0;")) {
             hayPrestamosVigentes = true;

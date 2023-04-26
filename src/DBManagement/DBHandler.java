@@ -31,7 +31,7 @@ public class DBHandler {
             while (resultset.next()) {
                 idPrestamo = resultset.getInt("idPrestamo");
                 idEjemplar = resultset.getInt("idEjemplar");
-                ejemplar = getEjemplar("SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + idEjemplar + "';");
+                ejemplar = getEjemplar("SELECT * FROM ejemplares WHERE idEjemplar = '" + idEjemplar + "';");
                 idLector = resultset.getInt("idLector");
                 lector = getLector("SELECT * FROM lectores WHERE idLector = " + idLector + ";");
                 fechaPrestamo = resultset.getDate("fecha_prestamo").toLocalDate();
@@ -74,7 +74,7 @@ public class DBHandler {
             while (resultset.next()) {
                 idPrestamo = resultset.getInt("idPrestamo");
                 idEjemplar = resultset.getInt("idEjemplar");
-                ejemplar = getEjemplar("SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + idEjemplar + "';");
+                ejemplar = getEjemplar("SELECT * FROM ejemplares WHERE idEjemplar = '" + idEjemplar + "';");
                 idLector = resultset.getInt("idLector");
                 lector = getLector("SELECT * FROM lectores WHERE idLector = " + idLector + ";");
                 fechaPrestamo = resultset.getDate("fecha_prestamo").toLocalDate();

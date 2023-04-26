@@ -97,7 +97,7 @@ public class Prestamo implements Comparable<Prestamo>, ElementoBiblioteca{
 
     @Override
     public String getUpdateString() {
-        return "UPDATE prestamos SET devuelto = 'true', fecha_devolucion = '" + LocalDate.now() + "';";
+        return "UPDATE prestamos SET devuelto = 1, fecha_devolucion = '" + LocalDate.now() + "';";
     }
 
     @Override
@@ -123,8 +123,9 @@ public class Prestamo implements Comparable<Prestamo>, ElementoBiblioteca{
     public String toString() {
         return ejemplar.toString()
                 + "\n - " + lector.toString()
-                + "\n Fecha prestamo: " + fechaPrestamo
-                + "\n Fecha devolucion: " + fechaDevolucion;
+                + "\n - Fecha prestamo: " + fechaPrestamo
+                + "\n - Fecha devolucion: " + fechaDevolucion
+                + "\n";
     }
 
     @Override

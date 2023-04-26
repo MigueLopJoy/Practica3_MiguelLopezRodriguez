@@ -82,7 +82,7 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
     }
     @Override
     public String toString() {
-        return codigoEjemplar + ": " + libro.toString();
+        return libro.toString() + " - Codigo: " + codigoEjemplar;
     }
     @Override
     public int compareTo(Ejemplar ejemplar) {
