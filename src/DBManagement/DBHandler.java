@@ -2,6 +2,7 @@ package DBManagement;
 
 import Biblioteca.*;
 import Gestion.Utils;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.Year;
@@ -9,11 +10,18 @@ import java.util.ArrayList;
 
 /**
  * Clase de metodos estaticos utilizados para el manejo de la base de datos del sistema
+ *
  * @author Miguel Lopez Rodriguez
  */
 public class DBHandler {
 
-
+    /**
+     * Recupera un Prestamo de la bdd en base a las restricciones establecidas por la consulta pasada por parametro
+     * y consturye un objeto Prestamo a partir de los datos obtenidos, el cual es devuelto
+     *
+     * @param sql consulta sql que establece las restricciones para la recuperacion de un Prestamo de la BDD
+     * @return Prestamo recuperado de la BDD
+     */
     public static Prestamo getPrestamo(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -56,6 +64,14 @@ public class DBHandler {
         }
         return prestamo;
     }
+
+    /**
+     * Recupera un conjunto de Prestamos de la bdd en base a las restricciones establecidas por la consulta pasada por parametro
+     * y consturye una lista de objetos Prestamo a partir de los datos obtenidos, la cual es devuelta
+     *
+     * @param sql consulta sql que establece las restricciones para la recuperacion de conjunto de Prestamos de la BDD
+     * @return Lista de Prestamos construida a partir de los datos recuperados de la BDD
+     */
     public static ArrayList<Prestamo> getPrestamos(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -101,6 +117,13 @@ public class DBHandler {
         return prestamos;
     }
 
+    /**
+     * Recupera un Lector de la BDD en base a las restricciones establecidas por la consulta pasada por parametro
+     * y consturye un objeto Lector a partir de los datos obtenidos, el cual es devuelto
+     *
+     * @param sql consulta sql que establece las restricciones para la recuperacion de un Lector de la BDD
+     * @return Lector recuperado de la BDD
+     */
     public static Lector getLector(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -144,6 +167,13 @@ public class DBHandler {
         return lector;
     }
 
+    /**
+     * Recupera un conjunto de Lectores de la bdd en base a las restricciones establecidas por la consulta pasada por parametro
+     * y consturye una lista de objetos Lector a partir de los datos obtenidos, la cual es devuelta
+     *
+     * @param sql consulta sql que establece las restricciones para la recuperacion de un conjunto de Lectores de la BDD
+     * @return Lista de lectores construida a partir de los datos recuperados de la BDD
+     */
     public static ArrayList<Lector> getLectores(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -189,6 +219,14 @@ public class DBHandler {
         return lectores;
     }
 
+
+    /**
+     * Recupera un Ejemplar de la bdd en base a las restricciones establecidas por la consulta pasada por parametro
+     * y consturye un objeto Ejemplar a partir de los datos obtenidos, el cual es devuelto
+     *
+     * @param sql consulta sql que establece las restricciones para la recuperacion de un Ejemplar de la BDD
+     * @return Ejemplar recuperado de la BDD
+     */
     public static Ejemplar getEjemplar(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -208,7 +246,7 @@ public class DBHandler {
                 codigoEjemplar = resultset.getString("codigo_ejemplar");
                 idLibro = resultset.getInt("idLibro");
                 libro = getLibro("SELECT * FROM catalogo WHERE idLibro = " + idLibro + ";");
-                ejemplar = new Ejemplar(idEjemplar,codigoEjemplar, libro);
+                ejemplar = new Ejemplar(idEjemplar, codigoEjemplar, libro);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -223,6 +261,14 @@ public class DBHandler {
         }
         return ejemplar;
     }
+
+    /**
+     * Recupera un conjunto de Ejemplares de la bdd en base a las restricciones establecidas por la consulta pasada por parametro
+     * y consturye una lista de objetos Ejemplar a partir de los datos obtenidos, la cual es devuelta
+     *
+     * @param sql consulta sql que establece las restricciones para la recuperacion de un conjunto de Ejemplares de la BDD
+     * @return Lista de Ejemplares construida a partir de los datos recuperados de la BDD
+     */
     public static ArrayList<Ejemplar> getEjemplares(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -243,7 +289,7 @@ public class DBHandler {
                 codigoEjemplar = resultset.getString("codigo_ejemplar");
                 idLibro = resultset.getInt("idLibro");
                 libro = getLibro("SELECT * FROM libros WHERE idLibro = " + idLibro + ";");
-                ejemplar = new Ejemplar(idEjemplar,codigoEjemplar, libro);
+                ejemplar = new Ejemplar(idEjemplar, codigoEjemplar, libro);
                 ejemplares.add(ejemplar);
             }
         } catch (SQLException e) {
@@ -260,6 +306,14 @@ public class DBHandler {
         return ejemplares;
     }
 
+
+    /**
+     * Recupera un Libro de la bdd en base a las restricciones establecidas por la consulta pasada por parametro
+     * y consturye un objeto Libro a partir de los datos obtenidos, el cual es devuelto
+     *
+     * @param sql consulta sql que establece las restricciones para la recuperacion de un Libro de la BDD
+     * @return Libro recuperado de la BDD
+     */
     public static Libro getLibro(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -298,6 +352,14 @@ public class DBHandler {
         }
         return libro;
     }
+
+    /**
+     * Recupera un conjunto de Libros de la bdd en base a las restricciones establecidas por la consulta pasada por parametro
+     * y consturye una lista de objetos Libro a partir de los datos obtenidos, la cual es devuelta
+     *
+     * @param sql consulta sql que establece las restricciones para la recuperacion de un conjunto de Libros de la BDD
+     * @return Lista de Libros construida a partir de los datos recuperados de la BDD
+     */
     public static ArrayList<Libro> getLibros(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -339,6 +401,14 @@ public class DBHandler {
         return libros;
     }
 
+
+    /**
+     * Recupera un Autor de la bdd en base a las restricciones establecidas por la consulta pasada por parametro
+     * y consturye un objeto Autor a partir de los datos obtenidos, el cual es devuelto
+     *
+     * @param sql consulta sql que establece las restricciones para la recuperacion de un Autor de la BDD
+     * @return Autor recuperado de la BDD
+     */
     public static Autor getAutor(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -372,6 +442,14 @@ public class DBHandler {
         return autor;
     }
 
+
+    /**
+     * Recupera un conjunto de Autores de la bdd en base a las restricciones establecidas por la consulta pasada por parametro
+     * y consturye una lista de objetos Autor a partir de los datos obtenidos, la cual es devuelta
+     *
+     * @param sql consulta sql que establece las restricciones para la recuperacion de un conjunto de Autores de la BDD
+     * @return Lista de Autores construida a partir de los datos recuperados de la BDD
+     */
     public static ArrayList<Autor> getAutores(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -407,6 +485,16 @@ public class DBHandler {
         return autores;
     }
 
+
+    /**
+     * Recupera un numero entero de la BDD a partir de dos datos pasados por parametro: una consulta sql, y un nombre
+     * del campo dentro del conjunto de columnas recuperadas por dicha consulta
+     *
+     * @param sql        consulta sql a partir de la cual recuperar el numero entero buscado
+     * @param columnName nombre de la columna dentro del conjunto de campos recuperados de la cual se quiere extraer
+     *                   el numero entero buscado
+     * @return numero entero encontrado
+     */
     public static int getInt(String sql, String columnName) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -434,6 +522,15 @@ public class DBHandler {
         return result;
     }
 
+    /**
+     * Recupera un numero entero de la BDD a partir de dos datos pasados por parametro: una consulta sql,
+     * y una posicion del campo dentro del conjunto de columnas recuperadas por dicha consulta
+     *
+     * @param sql         consulta sql a partir de la cual recuperar el numero entero buscado
+     * @param columnIndex posicion de la columna dentro del conjunto de campos recuperados con la consulta, de la
+     *                    cual se quiere extraer el numero entero buscado
+     * @return numero entero encontrado
+     */
     public static int getInt(String sql, int columnIndex) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -461,6 +558,16 @@ public class DBHandler {
         return result;
     }
 
+
+    /**
+     * Recupera una cadena de texto de la BDD a partir de dos datos pasados por parametro: una consulta sql, y un nombre
+     * del campo dentro del conjunto de columnas recuperadas por dicha consulta
+     *
+     * @param sql        consulta sql a partir de la cual recuperar la cadena de texto buscada
+     * @param columnName nombre de la columna dentro del conjunto de campos recuperados de la cual se quiere extraer
+     *                   la cadena de texto buscada
+     * @return cadena de texto encontrada
+     */
     public static String getString(String sql, String columnName) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -488,6 +595,15 @@ public class DBHandler {
         return result;
     }
 
+    /**
+     * Recupera una cadena de texto de la BDD a partir de dos datos pasados por parametro: una consulta sql,
+     * y una posicion del campo dentro del conjunto de columnas recuperadas por dicha consulta
+     *
+     * @param sql         consulta sql a partir de la cual recuperar la cadena de texto buscada
+     * @param columnIndex posicion de la columna dentro del conjunto de campos recuperados con la consulta, de la
+     *                    cual se quiere extraer la cadena de texto buscada
+     * @return cadena de texto encontrada
+     */
     public static String getString(String sql, int columnIndex) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -515,6 +631,12 @@ public class DBHandler {
         return result;
     }
 
+    /**
+     * Comprueba si la consulta sql pasada por parametro ofrece o no resultados en la BDD
+     *
+     * @param sql consulta a efectuar para saber si devuelve o no registros
+     * @return booleano que indica si existen o no registros a partir de la consulta realizada
+     */
     public static boolean hayRegistros(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -541,6 +663,11 @@ public class DBHandler {
         return hayRegistros;
     }
 
+    /**
+     * Efectua una actualizacion de la base de datos a partir de la consulta sql pasada por parametro
+     *
+     * @param sql consulta sql a partir de la cual efectuar una actualizacion de la base de datos
+     */
     public static void executeUpdate(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
         Connection connection = dbConnection.getConnection();
@@ -565,6 +692,11 @@ public class DBHandler {
         }
     }
 
+    /**
+     * Cierra el objeto Statement pasado por parametro
+     *
+     * @param statement objeto Statement a cerrar
+     */
     public static void closeStatement(Statement statement) {
         try {
             if (statement != null) {
@@ -575,6 +707,11 @@ public class DBHandler {
         }
     }
 
+    /**
+     * Cierra el objeto ResultSet pasado por parametro
+     *
+     * @param resultset objeto ResultSet a cerrar
+     */
     public static void closeResultset(ResultSet resultset) {
         try {
             if (resultset != null) {

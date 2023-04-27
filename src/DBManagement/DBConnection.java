@@ -4,10 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Clase encargada de establecer la conexion con la base de datos a traves de su constructor
+ */
 public class DBConnection {
     private String className;
     private String url;
     private Connection connection;
+
     public DBConnection(String user, String password) {
         this.className = "com.mysql.cj.jdbc.Driver";
         this.url = "jdbc:mysql://localhost:3307/biblioteca";
@@ -22,6 +26,7 @@ public class DBConnection {
             e.printStackTrace();
         }
     }
+
 
     public Connection getConnection(){
         return this.connection;
