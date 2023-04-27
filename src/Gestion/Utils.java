@@ -1,5 +1,7 @@
 package Gestion;
 
+import DBManagement.DBHandler;
+
 /**
  * Clase que contiene metodos genericos utilizados desde diferentes partes del sistema, como validaciones de datos
  * o normalizaciones.
@@ -154,5 +156,42 @@ public class Utils {
             mensaje = elementoInsertado + " " + operacion + " con exito";
         }
         return mensaje;
+    }
+
+    /**
+     * Genera aleatoreamente un codigo alfanumerico compuesto por 4 numeros y una letra mayuscula que podra
+     * ser utilizado tanto como codigo de lector como de numero de lector
+     *
+     * @return codigo alfanumerico que sera empleado como codigo de ejemplar o como numero de lector
+     */
+    public static String generarCodigo() {
+        String codigo = "";
+        char[] letras = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+
+        do {
+            for (int i = 0; i < 4; i++) {
+                codigo += (int) (Math.random() * 10);
+            }
+            codigo += letras[(int) (Math.random() * 26)];
+        } while (isRepetido(codigo));
+
+        return codigo;
+    }
+
+    /**
+     * Comprueba si el codigo pasado por parametro se encuentra ya asignado en la bdd a un lector o ejemplar
+     *
+     * @param codigo codigo cuya existencia se quiere comprobar en la bdd
+     * @return booleano que indica si el codigo pasado por parametro se encuentra vinculado o no a un ejemplar o lector
+     * en la bdd
+     */
+    private static boolean isRepetido(String codigo) {
+        boolean repetido = false;
+
+        if (DBHandler.hayRegistros("SELECT * FROM lectores WHERE numero_lector = '" + codigo + "';") ||
+                DBHandler.hayRegistros("SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + codigo + "';")) {
+            repetido = true;
+        }
+        return repetido;
     }
 }

@@ -1,30 +1,38 @@
 package Biblioteca;
 
+import Gestion.Utils;
 import DBManagement.DBHandler;
 
+/**
+ * Clase que permite crear y manejar los lectores de la Biblioteca. Implementa la interfaz 'ElementoBiblioteca'
+ *
+ * @author Miguel Lopez Rodriguez
+ */
 public class Lector extends Persona implements ElementoBiblioteca {
     private int idLector;
     private String numeroLector;
     private String telefono;
     private String email;
 
-    public Lector( ) {
+    public Lector() {
         super();
     }
+
     public Lector(String numeroLector) {
         super();
         this.numeroLector = numeroLector;
     }
+
     public Lector(String nombre, String apellidos, String telefono) {
         super(nombre, apellidos);
-        this.numeroLector = generarNumeroLector();
+        this.numeroLector = Utils.generarCodigo();
         this.telefono = telefono;
         this.idLector = getIdFromDB();
     }
 
     public Lector(String nombre, String apellidos, String telefono, String email) {
         super(nombre, apellidos);
-        this.numeroLector = generarNumeroLector();
+        this.numeroLector = Utils.generarCodigo();
         this.telefono = telefono;
         this.email = email;
         this.idLector = getIdFromDB();
@@ -77,58 +85,89 @@ public class Lector extends Persona implements ElementoBiblioteca {
         this.email = email;
     }
 
+    /**
+     * Implementacion del metodo definido en la interfaz 'ElementoBiblioteca'
+     * Retorna la sentencia sql para inserta un lector, que tomara una forma u otra en funcion de
+     * si el lector tiene o no email
+     *
+     * @return sentencia sql para insertar un lector
+     */
     @Override
     public String getInsertString() {
         String insertString;
         if (email != null) {
-            insertString = "INSERT INTO lectores (nombre, apellidos, numero_lector, numero_telefono, email) " +
-                    "VALUES ('" + getNombre() + "', '" + getApellidos() + "', '" + numeroLector
-                    + "', '" + telefono + "', '" + email + "');";
+            insertString = "INSERT INTO lectores (nombre, apellidos, numero_lector, numero_telefono, email) " + "VALUES ('" + getNombre() + "', '" + getApellidos() + "', '" + numeroLector + "', '" + telefono + "', '" + email + "');";
         } else {
-            insertString = "INSERT INTO lectores (nombre, apellidos, numero_lector, numero_telefono) " +
-                    "VALUES ('" + getNombre() + "', '" + getApellidos() + "', '" + numeroLector
-                    + "', '" + telefono + "');";
+            insertString = "INSERT INTO lectores (nombre, apellidos, numero_lector, numero_telefono) " + "VALUES ('" + getNombre() + "', '" + getApellidos() + "', '" + numeroLector + "', '" + telefono + "');";
         }
         return insertString;
     }
 
+    /**
+     * Implementacion del metodo definido en la interfaz 'ElementoBiblioteca'
+     * Retorna la sentencia sql para seleccionar un lector en base a sus datos personales
+     *
+     * @return sentencia sql para seleccionar un lector en base a sus datos personales
+     */
     @Override
     public String getSelectString() {
         String selectString;
 
         if (email != null) {
-            selectString = "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellidos = '" + getApellidos()
-                    + "' AND numero_lector = '" + numeroLector + "' AND numero_telefono = '" + telefono + "' AND email = '" + email + "';";
+            selectString = "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellidos = '" + getApellidos() + "' AND numero_lector = '" + numeroLector + "' AND numero_telefono = '" + telefono + "' AND email = '" + email + "';";
         } else {
-            selectString = "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellidos = '" + getApellidos()
-                    + "' AND numero_lector = '" + numeroLector + "' AND numero_telefono = '" + telefono + "';";
+            selectString = "SELECT * FROM lectores WHERE nombre = '" + getNombre() + "' AND apellidos = '" + getApellidos() + "' AND numero_lector = '" + numeroLector + "' AND numero_telefono = '" + telefono + "';";
         }
         return selectString;
     }
 
+    /**
+     * Implementacion del metodo definido en la interfaz 'ElementoBiblioteca'
+     * Retorna la sentencia sql para actualizar los datos de un lector, que tomara una forma u otra en
+     * funcion de si el lector tiene o no email
+     *
+     * @return sentencia sql para actualizar los datos de un lector
+     */
     @Override
     public String getUpdateString() {
         String updateString;
         if (email != null) {
-            updateString = "UPDATE lectores SET nombre = '" + getNombre() + "', apellidos = '" + getApellidos()
-                    + "', numero_lector = '" + numeroLector + "', numero_telefono = '" + telefono + "', email = '" + email
-                    + "' WHERE idLector = " + idLector;
+            updateString = "UPDATE lectores SET nombre = '" + getNombre() + "', apellidos = '" + getApellidos() + "', numero_lector = '" + numeroLector + "', numero_telefono = '" + telefono + "', email = '" + email + "' WHERE idLector = " + idLector;
         } else {
-            updateString = "UPDATE lectores SET nombre = '" + getNombre() + "', apellidos = '" + getApellidos()
-                    + "', numero_lector = '" + numeroLector + "', numero_telefono = '" + telefono + "' WHERE idLector = " + idLector;
+            updateString = "UPDATE lectores SET nombre = '" + getNombre() + "', apellidos = '" + getApellidos() + "', numero_lector = '" + numeroLector + "', numero_telefono = '" + telefono + "' WHERE idLector = " + idLector;
         }
         return updateString;
     }
 
+    /**
+     * Implementacion del metodo definido en la interfaz 'ElementoBiblioteca'
+     * Retorna la sentencia sql para eliminar un lector
+     *
+     * @return senencia sql para eliminar un lector
+     */
     public String getDeleteString() {
         return "DELETE FROM lectores WHERE numero_lector = '" + numeroLector + "';";
     }
 
+
+    /**
+     * Implementacion del metodo definido en la interfaz 'ElementoBiblioteca'
+     * Comprueba si el lector actual esta registrado en la bdd
+     *
+     * @return booleano que indica si el lector esta o no registrado en la bdd
+     */
     @Override
     public boolean isRegistrado() {
         return DBHandler.hayRegistros(getSelectString());
     }
 
+
+    /**
+     * Implementacion del metodo definido en la interfaz 'ElementoBiblioteca'
+     * Obtiene el id asignado en la bdd al lector actual
+     *
+     * @return id asignado en la bdd al lector actual
+     */
     @Override
     public int getIdFromDB() {
         int id = 0;
@@ -138,37 +177,22 @@ public class Lector extends Persona implements ElementoBiblioteca {
         return id;
     }
 
+    /**
+     * Sobreescribe el metodo toString de su clase padre Persona, haciendo una llamada al mismo y añadiendo informacion
+     * propia del lector.
+     * Crea y retorna una cadena de texto con la informacion del lector actual, que tomara una forma u otra segun
+     * tenga o no email
+     *
+     * @return una cadena de texto con la informacion del lector actual
+     */
     @Override
     public String toString() {
         String toString;
         if (email != null) {
             toString = super.toString() + " - Nº lector: " + this.numeroLector + " - Contacto: " + telefono + ", " + email;
         } else {
-            toString =  super.toString() + " - Nº lector: " + this.numeroLector + " - Contacto: " + telefono;
+            toString = super.toString() + " - Nº lector: " + this.numeroLector + " - Contacto: " + telefono;
         }
         return toString;
-    }
-
-    private String generarNumeroLector() {
-        String codigoEjemplar = "";
-        char[] letras = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-
-        do {
-            for (int i = 0; i < 8; i++) {
-                codigoEjemplar += (int) (Math.random() * 10);
-            }
-            codigoEjemplar += letras[(int) (Math.random() * 26)];
-        } while (isRepetido(codigoEjemplar));
-
-        return codigoEjemplar;
-    }
-
-    private static boolean isRepetido(String numLector) {
-        boolean repetido = false;
-
-        if(DBHandler.hayRegistros("SELECT * FROM lectores WHERE numero_lector = '" + numLector + "';")) {
-            repetido = true;
-        }
-        return repetido;
     }
 }

@@ -85,8 +85,7 @@ public class Catalogo {
      */
     private static String getSQLBusquedaAutor() {
         Autor autor = crearAutor();
-        String sql = "SELECT * FROM catalogo c INNER JOIN autores a ON c.idAutor = a.idAutor WHERE nombre = '"
-                + autor.getNombre() + "' AND apellidos = '" + autor.getApellidos() + "';";
+        String sql = "SELECT * FROM catalogo c INNER JOIN autores a ON c.idAutor = a.idAutor WHERE nombre = '" + autor.getNombre() + "' AND apellidos = '" + autor.getApellidos() + "';";
         return sql;
     }
 
@@ -435,8 +434,7 @@ public class Catalogo {
 
         for (int i = 0; i < libros.size(); i++) {
             libro = libros.get(i);
-            mensaje = " - " + (i + 1) + ". " + libro.toString()
-                    + " (Ejemplares: " + getNumEjemplaresEditorial(libro.getEditorial()) + ")";
+            mensaje = " - " + (i + 1) + ". " + libro.toString() + " (Ejemplares: " + getNumEjemplaresEditorial(libro.getEditorial()) + ")";
             ;
             System.out.println(mensaje);
         }
@@ -520,11 +518,7 @@ public class Catalogo {
      */
     private static int getNumEjemplaresEditorial(String editorial) {
         int numeroEjemplares = 0;
-        String sql =
-                "SELECT sub.cantidadEjemplares FROM ( " +
-                        "SELECT c.editorial, COUNT(e.idEjemplar) cantidadEjemplares FROM ejemplares e " +
-                        "INNER JOIN catalogo c ON e.idLibro = c.idLibro GROUP BY c.editorial ) AS sub " +
-                        "WHERE sub.editorial = '" + editorial + "';";
+        String sql = "SELECT sub.cantidadEjemplares FROM ( " + "SELECT c.editorial, COUNT(e.idEjemplar) cantidadEjemplares FROM ejemplares e " + "INNER JOIN catalogo c ON e.idLibro = c.idLibro GROUP BY c.editorial ) AS sub " + "WHERE sub.editorial = '" + editorial + "';";
 
         numeroEjemplares = DBHandler.getInt(sql, 1);
         return numeroEjemplares;
