@@ -5,29 +5,53 @@ import java.util.Scanner;
 public class pedirDatos {
 	private static Scanner scanner = new Scanner(System.in);
 
+
+	/**
+	 * Pidede al usaurio un año que debera estar comprendido entre el 1500 y el 2022
+	 * @param texto Texto que aparecera en pantalla para solicitar el dato al usuario
+	 * @return año introducido por el usuario
+	 */
 	public static Year pedirAño(String texto) {
 		Year año;
 		año = Year.of(pedirInt(texto, 1500, 2022));
 		return año;
 	}
 
+	/**
+	 * Pidea uanc adena de texto que debera encajar con el formato establecido en 'validarCodigo()'. Uilizada para pedir
+	 * codigos de ejemplar o numeros de lector.
+	 * @param texto Texto que aparecera en pantalla para solicitar el dato al usuario
+	 * @return codigo introducido por el usuario
+	 */
 	public static String pedirCodigo(String texto) {
 		String codigo;
 		do {
 			codigo = pedirDatos.pedirString(texto);
-			codigo = codigo.trim();
 		} while (!Utils.validarCodigo(codigo));
 		return codigo;
 	}
+
+	/**
+	 * Pide una cadena de texto que debera encajar con el formato establecido en 'validarNombre()' y que sera corregida
+	 * segun los criterios de 'corregirNombre()';
+	 * @param texto texto que aparecera en consola para solicitar al usuario el dato
+	 * @return nombre introducido por el usuario
+	 */
 	public static String pedirNombre(String texto) {
 		String nombre;
 		do {
 			nombre = pedirDatos.pedirString(texto);
-			nombre = Utils.convertirPrimeraMayuscula(nombre);
+			Utils.corregirNombre(nombre);
 		} while (!Utils.validarNombre(nombre));
 		return nombre;
 	}
 
+	/**
+	 * Pide una cadena de texto que debera encajar con el formato establecido en 'validarCorreo()' y cuyos caracteres alfabeticos
+	 * seran convertidos a minusculas
+	 * @param texto Texto que aparecera en pantalla para solicitar el dato al usuario
+ 	 * @return correo introducido por el usuario
+	 */
 	public static String pedirCorreo(String texto) {
 		String correo;
 		do {
@@ -37,6 +61,11 @@ public class pedirDatos {
 		return correo;
 	}
 
+	/**
+	 * Pide una cadena de texto que debera encajar con el formato de establecido en 'validarTelefono()'
+	 * @param texto Texto que aparecera en pantalla para solicitar el dato al usuario
+	 * @return telefono introducido por el usuario
+	 */
 	public static String pedirTelefono(String texto) {
 		String telefono;
 		do {

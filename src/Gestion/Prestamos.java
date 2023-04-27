@@ -6,6 +6,11 @@ import DBManagement.DBHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Clase que contiene todos los metos vinculados al modulo de circulacion del sistema (prestamos y devoluciones, y consultas de prestamos)
+ *
+ * @author Miguel Lopez Rodriguez
+ */
 public class Prestamos {
 
     /**
@@ -102,6 +107,7 @@ public class Prestamos {
 
     /**
      * Devuelve una lista con el/ los prestamos recuperados de una busqueda efectuada en base a una opcion de busqueda escogida por el usuario
+     *
      * @param option opcion de busqueda previamente escogida por el suaurio
      * @return Lista de prestamos recuperada de la busqueda del usuario
      */
@@ -115,33 +121,56 @@ public class Prestamos {
         switch (option) {
             case 1: {
                 // Recupera todos los prestamos de libros no devueltos
-                sql = "SELECT * FROM prestamos WHERE devuelto = 0;";
-                prestamos = DBHandler.getPrestamos(sql);
+                prestamos = DBHandler.getPrestamos("SELECT * FROM prestamos WHERE devuelto = 0;");
                 break;
             }
             case 2: {
                 // Recupera el unico prestamo que puede estar asociado a un ejemplar
-                sql = "SELECT * FROM ejemplares e INNER JOIN prestamos p ON e.idEjemplar = p.idEjemplar WHERE p.devuelto = 0;";
-                ejemplar = Catalogo.escogerEjemplar(sql);
-                prestamo = escogerPrestamoEjemplar(ejemplar);
-                if (prestamo != null) {
-                    prestamos.add(prestamo);
-                }
+                prestamos = recuperarPrestamoEjemplar();
                 break;
             }
             case 3: {
                 // Recupera todos los prestamos que pueden estar asociados a un lector
-                sql = "SELECT * FROM lectores l INNER JOIN prestamos p ON l.idLector = p.idLector WHERE devuelto = 0;";
-                lector = Lectores.escogerLectorNumero(sql);
-                prestamos = escogerPrestamosLector(lector);
+                prestamos = recuperarPrestamosLector();
                 break;
             }
         }
         return prestamos;
     }
 
+
+    /**
+     * Recupera una lista que contendra el unico posible prestamo asociado al ejemplar escogido por el usuario
+     *
+     * @return lista con el unico posible prestamo asociado al ejemplar escogido por el ususairo
+     */
+    private static ArrayList<Prestamo> recuperarPrestamoEjemplar() {
+        ArrayList<Prestamo> prestamos = new ArrayList<Prestamo>();
+        String sql = "SELECT * FROM ejemplares e INNER JOIN prestamos p ON e.idEjemplar = p.idEjemplar WHERE p.devuelto = 0;";
+        Ejemplar ejemplar = Catalogo.escogerEjemplar(sql);
+        Prestamo prestamo = escogerPrestamoEjemplar(ejemplar);
+        if (prestamo != null) {
+            prestamos.add(prestamo);
+        }
+        return prestamos;
+    }
+
+    /**
+     * Recupera una lista con todos los posibles prestamos vinculados al lector seleccionado por el usuario
+     *
+     * @return lista con todos los posibles prestamos vinculados a un lector escogido por el usuario
+     */
+    private static ArrayList<Prestamo> recuperarPrestamosLector() {
+        ArrayList<Prestamo> prestamos;
+        String sql = "SELECT * FROM lectores l INNER JOIN prestamos p ON l.idLector = p.idLector WHERE devuelto = 0;";
+        Lector lector = Lectores.escogerLectorNumero(sql);
+        prestamos = escogerPrestamosLector(lector);
+        return prestamos;
+    }
+
     /**
      * Recupera los prestamos asociados al ejemplar pasado por parametro si lo hubiere
+     *
      * @param ejemplar ejemplar del cual se quieren recuperar los prestamos asociados
      * @return prestamo asocaido al ejemplar pasado por parametro
      */
@@ -159,6 +188,7 @@ public class Prestamos {
 
     /**
      * Recupera el conjunto de prestamos que puede haber asociado a un lector indicado por parametro
+     *
      * @param lector lector del cual se quiere recuperar el conjunto de prestamos a el asociados, si lo hubiere
      * @return conjunto de prestamos asociados al lector
      */

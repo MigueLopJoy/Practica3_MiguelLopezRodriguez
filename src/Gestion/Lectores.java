@@ -3,10 +3,14 @@ package Gestion;
 import Biblioteca.*;
 import DBManagement.DBHandler;
 import User.pedirDatos;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Clase que contiene todos los metodos relacionados con el modulo de gestion de lectores (der de alta y de baja, y buscar lectores)
+ *
+ * @author Miguel Lopez Rodriguez
+ */
 public class Lectores {
 
     /**
@@ -93,6 +97,7 @@ public class Lectores {
 
     /**
      * Lleva a efecto la eliminacion de la bdd del lector pasado por parametro siempre que no tenga prestamos vinculados
+     *
      * @param lector lector a eliminar
      */
     private static void eliminarLector(Lector lector) {
@@ -108,6 +113,7 @@ public class Lectores {
 
     /**
      * Comprueba si hay prestamos vinculados al lector pasado por parametro
+     *
      * @param lector lector del cual se quiere comprobar si hay prestamos a el vinculados
      * @return booleano que indica si hay o no prestamos vinculados al lector pasado por parametro
      */
@@ -121,6 +127,7 @@ public class Lectores {
 
     /**
      * Devuelve una lista de lectores cuyo nombre y apellidos coincidan con los indicados por el usuario
+     *
      * @return lista de lectores cuyo nombre y apellidos coincen con los indicados por el usaurio
      */
     private static ArrayList<Lector> escogerLectorNombre() {
@@ -142,6 +149,7 @@ public class Lectores {
 
     /**
      * Solicita un numero de usuario y devuelve al lector vinculado a dicho numero de usuario, si lo hubiere
+     *
      * @param sql Consulta que delimita un ambito de busqueda en el cual se comprobaran si existen registros
      * @return lector asociado al numero de usuario indicado
      */
@@ -167,6 +175,7 @@ public class Lectores {
 
     /**
      * Imprime por consola las caracteristicas de los lectores almacenados en la lista pasada por parametro
+     *
      * @param lectores lista de lectores a imprimir por consola
      */
     private static void mostrarLectores(ArrayList<Lector> lectores) {
@@ -317,7 +326,7 @@ public class Lectores {
      *
      * @param numeroTelefono numero de telefono que quiere comprobarse si existe en la bdd
      * @param idLector       id del lector al cual si puede estar asociada el numero de telefono pasado por parametro
-     * @return booleano que indica si el numero de telefono pasado por parametro ya existe en la bdd, exluyendo la posibilidad de que exista asociada al lector vinculado al id señalado
+     * @return booleano que indica si el numero DE telefono pasado por parametro ya existe en la bdd, exluyendo la posibilidad de que exista asociada al lector vinculado al id señalado
      */
     private static boolean isTelefonoRepetido(String numeroTelefono, int idLector) {
         boolean repetido = false;

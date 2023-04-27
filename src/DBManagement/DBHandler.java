@@ -2,13 +2,17 @@ package DBManagement;
 
 import Biblioteca.*;
 import Gestion.Utils;
-
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
 
+/**
+ * Clase de metodos estaticos utilizados para el manejo de la base de datos del sistema
+ * @author Miguel Lopez Rodriguez
+ */
 public class DBHandler {
+
 
     public static Prestamo getPrestamo(String sql) {
         DBConnection dbConnection = new DBConnection("root", "1234");
