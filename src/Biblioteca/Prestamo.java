@@ -89,6 +89,14 @@ public class Prestamo implements Comparable<Prestamo>, ElementoBiblioteca {
         this.fechaDevolucion = fechaDevolucion;
     }
 
+    public int isDevuelto() {
+        return devuelto;
+    }
+
+    public void setDevuelto(int devuelto) {
+        this.devuelto = devuelto;
+    }
+
     /**
      * Implementacion del metodo definido en la interfaz 'ElementoBiblioteca'
      * Retorna la sentencia sql para inserta un prestamo
@@ -102,17 +110,10 @@ public class Prestamo implements Comparable<Prestamo>, ElementoBiblioteca {
                 + fechaDevolucion + "', '" + devuelto + "');";
     }
 
-    /**
-     * Implementacion del metodo definido en la interfaz 'ElementoBiblioteca'
-     * Retorna la sentencia sql para seleccionar un prestamo
-     *
-     * @return sentencia sql para seleccionar un prestamo
-     */
     @Override
     public String getSelectString() {
-        return "SELECT FROM prestamos WHERE idEjemplar = '" + ejemplar.getIdEjemplar() + "', OR idLector = '" + lector.getIdLector() + "';";
+        return "SELECT * FROM prestamos WHERE idEjemplar = " + ejemplar.getIdEjemplar() + " AND idLector = " + lector.getIdLector() + ";";
     }
-
 
     /**
      * Implementacion del metodo definido en la interfaz 'ElementoBiblioteca'
@@ -122,7 +123,7 @@ public class Prestamo implements Comparable<Prestamo>, ElementoBiblioteca {
      */
     @Override
     public String getUpdateString() {
-        return "UPDATE prestamos SET devuelto = 1, fecha_devolucion = '" + LocalDate.now() + "';";
+        return "UPDATE prestamos SET devuelto = 1, fecha_devolucion = '" + LocalDate.now() + "' WHERE idPrestamo = " + idPrestamo + ";";
     }
 
     /**

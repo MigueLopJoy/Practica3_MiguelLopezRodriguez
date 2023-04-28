@@ -73,7 +73,7 @@ public class Utils {
     public static boolean validarCodigo(String codigo) {
         boolean codigoValido = false;
 
-        if (codigo.matches("^[0-9]{8}[A-Z]$")) {
+        if (codigo.matches("^[0-9]{4}[A-Z]$")) {
             codigoValido = true;
         } else {
             System.out.println("Codigo no valido");
@@ -82,45 +82,31 @@ public class Utils {
     }
 
     /**
-     * Corrige un nombre para adecuarlo a un formato estandar (primera mayuscula y demas minuscula)
+     * Utilizado para la peticion de nombres y apellidos, recibe una cadena de texto y la adecua al
+     * formato estandar de dichos datos: primera mayuscula y el resto minuscula
      *
-     * @param nombre nombre que quiere ser normalizado
-     * @return nombre normalizado
-     */
-    public static String corregirNombre(String nombre) {
-        String nombreCorregido = "";
-
-        if (validarNombre(nombre)) {
-            // Convierte a mayuscula la primera letra del nombre
-            nombreCorregido += convertirPrimeraMayuscula(nombre);
-            // Convierte a minuscula el resto del nombre
-            nombreCorregido += nombre.substring(1).toLowerCase();
-        }
-        return nombreCorregido;
-    }
-
-    /**
-     * Convierte a mayuscula la primera letra de cada palabra de una cadena de texto
-     *
-     * @param texto Texto a modificar convirtiendo a mayuscula la primera letra de cada palabra de la cadena
+     * @param nombre Texto a modificar convirtiendo a mayuscula la primera letra de cada palabra de la cadena
      * @return cadena de texto con la primera letra de cada palabra convertida a mayuscula
      */
-    public static String convertirPrimeraMayuscula(String texto) {
+    public static String normalizarNombre(String nombre) {
         String[] palabrasTexto;
         String textoMayusculas = "";
 
-        // Llena el array 'palabrasTexto' con los elementos de la cadena pasada por parametro obtenidos de aplicar
-        // el separador " " (espacio en blanco) a la misma
-        palabrasTexto = texto.split(" ");
-        for (String palabraTexto : palabrasTexto) {
-            // Comprueba que el primer caracter cada elemento del array es una letra
-            if (palabraTexto.length() > 0 && Character.isLetter(palabraTexto.charAt(0))) {
-                // Se suma a 'textoMayusculas' la palabra con la primera letra convertida a mayuscula mas un espacio en blanco
-                textoMayusculas += (palabraTexto.toUpperCase().charAt(0) + palabraTexto.substring(1, palabraTexto.length()) + " ");
+        // Comprueba que el texto recibido es un nombre valido
+        if (validarNombre(nombre)) {
+            // Llena el array 'palabrasTexto' con los elementos de la cadena pasada por parametro obtenidos de aplicar
+            // el separador " " (espacio en blanco) a la misma
+            palabrasTexto = nombre.split(" ");
+            for (String palabraTexto : palabrasTexto) {
+                // Comprueba que el primer caracter cada elemento del array es una letra
+                if (palabraTexto.length() > 0 && Character.isLetter(palabraTexto.charAt(0))) {
+                    // Se suma a 'textoMayusculas' la palabra con la primera letra convertida a mayuscula mas un espacio en blanco
+                    textoMayusculas += (palabraTexto.toUpperCase().charAt(0) + (palabraTexto.substring(1, palabraTexto.length()).toLowerCase()) + " ");
+                }
             }
+            // Eliminar espacios en blanco sobrantes
+            textoMayusculas = textoMayusculas.trim();
         }
-        // Eliminar espacios en blanco sobrantes
-        textoMayusculas = textoMayusculas.trim();
         return textoMayusculas;
     }
 

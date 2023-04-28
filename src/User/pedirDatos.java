@@ -51,7 +51,7 @@ public class pedirDatos {
         String nombre;
         do {
             nombre = pedirDatos.pedirString(texto);
-            Utils.corregirNombre(nombre);
+            Utils.normalizarNombre(nombre);
         } while (!Utils.validarNombre(nombre));
         return nombre;
     }
@@ -102,26 +102,6 @@ public class pedirDatos {
             }
             retorno = retorno.trim();
         } while (retorno.isEmpty() || retorno.trim().isEmpty());
-        return retorno;
-    }
-
-    /**
-     * Muestra un texto pasado por parametro y permite al usuario introducir
-     * cualquier numero entero
-     *
-     * @param texto texto a mostrar por consola
-     * @return numero entero introducido por el usuario
-     */
-    public static int pedirInt(String texto) {
-        int retorno;
-        System.out.print(texto + "\n");
-        while (!scanner.hasNextInt()) {
-            System.out.println("Debe introducir un numero");
-            System.out.print(texto + "\n");
-            scanner.next();
-        }
-        retorno = scanner.nextInt();
-        scanner.nextLine();
         return retorno;
     }
 

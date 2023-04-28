@@ -95,15 +95,9 @@ public class Ejemplar implements Comparable<Ejemplar>, ElementoBiblioteca {
         return "SELECT * FROM ejemplares WHERE codigo_ejemplar = '" + codigoEjemplar + "';";
     }
 
-    /**
-     * Implementacion del metodo definido en la interfaz 'ElementoBiblioteca'
-     * Retorna la sentencia sql para actualizar los datos de un ejemplar
-     *
-     * @return sentencia sql para actualizar los datos de un ejemplar
-     */
     @Override
     public String getUpdateString() {
-        return "";
+        return null;
     }
 
     /**
